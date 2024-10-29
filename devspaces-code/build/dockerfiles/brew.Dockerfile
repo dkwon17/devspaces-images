@@ -23,13 +23,16 @@ USER root
 WORKDIR $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code
 ENV ELECTRON_SKIP_BINARY_DOWNLOAD=1 \
     PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 \
-    NPM_CONFIG_NODEDIR=/usr \
     # workaround for https://github.com/nodejs/node/issues/51555
-    DISABLE_V8_COMPILE_CACHE=1
+    DISABLE_V8_COMPILE_CACHE=1 \
+    # workaround for https://github.com/nodejs/node/issues/52229
+    CXXFLAGS='-DNODE_API_EXPERIMENTAL_NOGC_ENV_OPT_OUT' \
+    # cachito: configure npm, both variables are required
+    NPM_CONFIG_NODEDIR=/usr \
+    npm_config_nodedir=/usr
 
-ENV CXXFLAGS='-DNODE_API_EXPERIMENTAL_NOGC_ENV_OPT_OUT'
-
-# cachito:yarn step 1: copy cachito sources where we can use them; source env vars; set working dir
+# cachito: copy cachito sources where we can use them
+# see https://docs.engineering.redhat.com/pages/viewpage.action?pageId=228017926#UpstreamSources(Cachito,ContainerFirst)-CachitoIntegrationfornpm
 COPY $REMOTE_SOURCES $REMOTE_SOURCES_DIR
 
 # Enable pulp content sets to resolve libsecret & libxkbfile as rpm
@@ -43,13 +46,13 @@ RUN \
     git git-core-doc openssh openssl-devel ca-certificates \
     less libX11-devel libxkbcommon libxkbfile-devel libxkbfile bash tar gzip rsync patch tree jq
 
+# cachito: source env vars
 # hadolint ignore=SC2086
 RUN source $REMOTE_SOURCES_DIR/devspaces-images-code/cachito.env; \
        cat $REMOTE_SOURCES_DIR/devspaces-images-code/cachito.env 
 
-
 # VS Code depends on @vscode/ripgrep that downloads the required ripgrep binary from microsoft/ripgrep-prebuilt
-# during 'yarn install' phase. That doen't work in OSBS due to offline mode.
+# during 'npm install' phase. That doen't work in OSBS due to offline mode.
 # So, we upload the required binaries to download.devel to be able to download them in OSBS environment (see fetch-artifacts-url.yaml).
 # Before trying to fetch the binary from GitHub, @vscode/ripgrep looks for it in the local cache folder.
 # See the cache folder name pattern in https://github.com/microsoft/vscode-ripgrep/blob/a85a6872107d616942511ea4421f438608b6579a/lib/download.js#L15
@@ -91,88 +94,99 @@ RUN for vsixfile in /tmp/builtInExtensions/*; do \
 # Initialize a git repository for code build tools
 RUN git init .; \
     # change network timeout (slow using multi-arch build)
-    npm config set fetch-retry-mintimeout 100000 && npm config set fetch-retry-maxtimeout 600000
+    npm config set fetch-retry-mintimeout 100000 && npm config set fetch-retry-maxtimeout 600000;
 
-    # cachito:yarn step 3: configure yarn & install deps
-    # see https://docs.engineering.redhat.com/pages/viewpage.action?pageId=228017926#UpstreamSources(Cachito,ContainerFirst)-CachitoIntegrationfornpm
-ENV NPM_CONFIG_NODEDIR=/usr
-RUN npm install --unsafe-perm
-
-# Normally, we call 'yarn' on VS Code to install the dependencies:
+# Normally, we call 'npm install' on VS Code to install the dependencies:
 # - for the root package;
 # - for the sub-packages (extensions), by triggerring the `build/npm/postinstall.js`.
 # The problem here is that the script can't fetch the dependencies from the Cachito's Nexus registry.
-# It responds "401 Unauthorized" when yarn tries to fetch a dependency for any VS Code's sub-package.
+# It responds "401 Unauthorized" when npm tries to fetch a dependency for any VS Code's sub-package.
 # However, it works well for the root package.
 #
-# The workaround is to disable the 'yarn install' call for the sub-packages ...
-# RUN sed -i -r -e '/function yarnInstall/ !s|^[^#]*yarnInstal|//&|' build/npm/postinstall.js
+# The workaround is to disable the 'npm install' call for the sub-packages ...
+RUN sed -i -r -e '/function npmInstall/ !s|^[^#]*npmInstal|//&|' build/npm/postinstall.js
 # ... and run the dependencies installation manually for each sub-package listed in the 'code/build/npm/dirs.js' (except the 'test' folder).
 
-# Cachito clears all project's '.yarnrc' files, To make sure yarn is configured to the local Nexus.
+# Cachito clears all project's '.npmrc' files, To make sure npm is configured to the local Nexus.
 # To avoid any possible issues, like failure of build because of missing 'ms_build_id', or 'target' properties,
 # or @parcel/watcher skipping compilation because of missing 'build_from_source' flag.
 # We need to restore some of the fields before running the build.
 # https://github.com/microsoft/vscode/blob/bceaaf84a27c3a95a0cdfc79287e3215b56b951c/build/gulpfile.reh.js#L128
-RUN echo 'target="30.5.1"' > $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/.npmrc; \
+RUN echo 'target="30.5.1"' >> $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/.npmrc; \
     echo 'ms_build_id="10306386"' >> $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/.npmrc; \
+    echo 'runtime="electron"' >> $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/.npmrc; \
     echo 'build_from_source="true"' >> $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/.npmrc; \
     echo 'legacy-peer-deps="true"' >> $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/.npmrc; \
-    echo 'target="20.16.0"' > $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/remote/.npmrc; \
+    echo 'timeout=180000' >> $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/.npmrc; \
+    echo 'target="20.16.0"' >> $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/remote/.npmrc; \
     echo 'ms_build_id="289487"' >> $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/remote/.npmrc; \
     echo 'build_from_source="true"' >> $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/remote/.npmrc; \
     echo 'legacy-peer-deps="true"' >> $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/remote/.npmrc;
 
+RUN set -x; \
+    NODE_ARCH=$(echo "console.log(process.arch)" | node) \
+    && NODE_VERSION=$(cat $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/remote/.npmrc | grep target | cut -d '=' -f 2 | tr -d '"') \
+    && echo "#####>> Arch & Version: $NODE_ARCH; $NODE_VERSION <<#####" \
+    # cache node from this image to avoid to grab it from within the build
+    && mkdir -p $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/.build/node/v${NODE_VERSION}/linux-${NODE_ARCH} \
+    && echo "caching $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/.build/node/v${NODE_VERSION}/linux-${NODE_ARCH}/node"; \
+    cp /usr/bin/node $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/.build/node/v${NODE_VERSION}/linux-${NODE_ARCH}/node; \
+    echo "########################################################path"; \
+    # add bin folder to path to resolve gulp and other binaries
+    export PATH=${PATH}:$REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/node_modules/.bin; \
+    echo $PATH
+
 # begin of module list generated by sync.sh
-RUN cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/ && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/build && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/che-activity-tracker && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/che-api && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/che-commands && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/che-port && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/che-remote && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/che-resource-monitor && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/che-terminal && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/che-github-authentication && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/configuration-editing && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/css-language-features && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/css-language-features/server && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/debug-auto-launch && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/debug-server-ready && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/emmet && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/extension-editing && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/git && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/git-base && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/github && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/github-authentication && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/grunt && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/gulp && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/html-language-features && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/html-language-features/server && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/ipynb && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/jake && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/json-language-features && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/json-language-features/server && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/markdown-language-features && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/markdown-math && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/media-preview && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/merge-conflict && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/microsoft-authentication && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/notebook-renderers && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/npm && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/php-language-features && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/references-view && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/search-result && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/simple-browser && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/tunnel-forwarding && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/typescript-language-features && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/vscode-api-tests && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/vscode-colorize-tests && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/vscode-test-resolver && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/remote && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/remote/web && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/.vscode/extensions/vscode-selfhost-test-provider && npm install 
+RUN cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/ && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/build && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/che-activity-tracker && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/che-api && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/che-commands && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/che-port && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/che-remote && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/che-resource-monitor && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/che-terminal && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/che-github-authentication && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/configuration-editing && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/css-language-features && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/css-language-features/server && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/debug-auto-launch && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/debug-server-ready && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/emmet && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/extension-editing && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/git && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/git-base && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/github && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/github-authentication && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/grunt && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/gulp && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/html-language-features && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/html-language-features/server && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/ipynb && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/jake && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/json-language-features && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/json-language-features/server && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/markdown-language-features && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/markdown-math && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/media-preview && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/merge-conflict && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/microsoft-authentication && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/notebook-renderers && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/npm && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/php-language-features && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/references-view && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/search-result && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/simple-browser && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/tunnel-forwarding && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/typescript-language-features && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/vscode-api-tests && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/vscode-colorize-tests && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/vscode-test-resolver && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/remote && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/remote/web && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/.vscode/extensions/vscode-selfhost-test-provider && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/.vscode/extensions/vscode-selfhost-import-aid && npm install --legacy-peer-deps --unsafe-perm
 # end of module list generated by sync.sh
 
 # hadolint ignore=SC3045
@@ -182,19 +196,7 @@ RUN echo "$(ulimit -a)"
 # hadolint ignore=SC2086,DL4006
 RUN set -x; \
     NODE_ARCH=$(echo "console.log(process.arch)" | node) \
-    && NODE_VERSION=$(cat $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/remote/.npmrc | grep target | cut -d '=' -f 2 | tr -d '"') \
-    && echo "#####>> Arch & Version: $NODE_ARCH; $NODE_VERSION <<#####" \
-    # cache node from this image to avoid to grab it from within the build
-    && mkdir -p $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/.build/node/v${NODE_VERSION}/linux-${NODE_ARCH} \
-    && echo "caching $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/.build/node/v${NODE_VERSION}/linux-${NODE_ARCH}/node"; \
-    cp /usr/bin/node $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/.build/node/v${NODE_VERSION}/linux-${NODE_ARCH}/node; \
-
-    echo "########################################################path"; \
-    # add bin folder to path to resolve gulp and other binaries
-    export PATH=${PATH}:$REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/node_modules/.bin; \
-    echo $PATH; \
-
-    NODE_OPTIONS="--max_old_space_size=8500" ./node_modules/.bin/gulp vscode-reh-web-linux-${NODE_ARCH}-min -LLLL \
+    && NODE_OPTIONS="--max_old_space_size=8500" ./node_modules/.bin/gulp vscode-reh-web-linux-${NODE_ARCH}-min -LLLL \
     && cp -r ../vscode-reh-web-linux-${NODE_ARCH} /checode
 
 RUN chmod a+x /checode/out/server-main.js \
@@ -219,13 +221,16 @@ USER root
 WORKDIR $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code
 ENV ELECTRON_SKIP_BINARY_DOWNLOAD=1 \
     PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 \
-    NPM_CONFIG_NODEDIR=/usr \
     # workaround for https://github.com/nodejs/node/issues/51555
-    DISABLE_V8_COMPILE_CACHE=1
+    DISABLE_V8_COMPILE_CACHE=1 \
+    # workaround for https://github.com/nodejs/node/issues/52229
+    CXXFLAGS='-DNODE_API_EXPERIMENTAL_NOGC_ENV_OPT_OUT' \
+    # cachito: configure npm, both variables are required 
+    NPM_CONFIG_NODEDIR=/usr \
+    npm_config_nodedir=/usr
 
-ENV CXXFLAGS='-DNODE_API_EXPERIMENTAL_NOGC_ENV_OPT_OUT'
-
-# cachito:yarn step 1: copy cachito sources where we can use them; source env vars; set working dir
+# cachito: copy cachito sources where we can use them
+# see https://docs.engineering.redhat.com/pages/viewpage.action?pageId=228017926#UpstreamSources(Cachito,ContainerFirst)-CachitoIntegrationfornpm
 COPY $REMOTE_SOURCES $REMOTE_SOURCES_DIR
 
 # Enable pulp content sets to resolve libsecret & libxkbfile as rpm
@@ -248,17 +253,13 @@ RUN \
     git git-core-doc openssh ca-certificates \
     less libX11-devel libxkbcommon libxkbfile-devel libxkbfile bash tar gzip rsync patch tree
 
+# cachito: source env vars
 # hadolint ignore=SC2086
 RUN source $REMOTE_SOURCES_DIR/devspaces-images-code/cachito.env; \
        cat $REMOTE_SOURCES_DIR/devspaces-images-code/cachito.env 
 
-# cachito:yarn step 2: workaround for yarn not being installed in an executable path
-# hadolint ignore=SC2086
-# RUN ln -s $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-dashboard/.yarn/releases/yarn-*.cjs /usr/local/bin/yarn
-
-
 # VS Code depends on @vscode/ripgrep that downloads the required ripgrep binary from microsoft/ripgrep-prebuilt
-# during 'yarn install' phase. That doen't work in OSBS due to offline mode.
+# during 'npm install' phase. That doen't work in OSBS due to offline mode.
 # So, we upload the required binaries to download.devel to be able to download them in OSBS environment (see fetch-artifacts-url.yaml).
 # Before trying to fetch the binary from GitHub, @vscode/ripgrep looks for it in the local cache folder.
 # See the cache folder name pattern in https://github.com/microsoft/vscode-ripgrep/blob/a85a6872107d616942511ea4421f438608b6579a/lib/download.js#L15
@@ -300,89 +301,99 @@ RUN for vsixfile in /tmp/builtInExtensions/*; do \
 # Initialize a git repository for code build tools
 RUN git init .; \
     # change network timeout (slow using multi-arch build)
-    npm config set fetch-retry-mintimeout 100000 && npm config set fetch-retry-maxtimeout 600000
+    npm config set fetch-retry-mintimeout 100000 && npm config set fetch-retry-maxtimeout 600000;
 
-    # cachito:yarn step 3: configure yarn & install deps
-    # see https://docs.engineering.redhat.com/pages/viewpage.action?pageId=228017926#UpstreamSources(Cachito,ContainerFirst)-CachitoIntegrationfornpm
-ENV NPM_CONFIG_NODEDIR=/usr
-RUN npm install --unsafe-perm
-
-
-# Normally, we call 'yarn' on VS Code to install the dependencies:
+# Normally, we call 'npm install' on VS Code to install the dependencies:
 # - for the root package;
 # - for the sub-packages (extensions), by triggerring the `build/npm/postinstall.js`.
 # The problem here is that the script can't fetch the dependencies from the Cachito's Nexus registry.
-# It responds "401 Unauthorized" when yarn tries to fetch a dependency for any VS Code's sub-package.
+# It responds "401 Unauthorized" when npm tries to fetch a dependency for any VS Code's sub-package.
 # However, it works well for the root package.
 #
-# The workaround is to disable the 'yarn install' call for the sub-packages ...
-# RUN sed -i -r -e '/function yarnInstall/ !s|^[^#]*yarnInstal|//&|' build/npm/postinstall.js
+# The workaround is to disable the 'npm install' call for the sub-packages ...
+RUN sed -i -r -e '/function npmInstall/ !s|^[^#]*npmInstal|//&|' build/npm/postinstall.js
 # ... and run the dependencies installation manually for each sub-package listed in the 'code/build/npm/dirs.js' (except the 'test' folder).
 
-# Cachito clears all project's '.yarnrc' files, To make sure yarn is configured to the local Nexus.
+# Cachito clears all project's '.npmrc' files, To make sure npm is configured to the local Nexus.
 # To avoid any possible issues, like failure of build because of missing 'ms_build_id', or 'target' properties,
 # or @parcel/watcher skipping compilation because of missing 'build_from_source' flag.
 # We need to restore some of the fields before running the build.
 # https://github.com/microsoft/vscode/blob/bceaaf84a27c3a95a0cdfc79287e3215b56b951c/build/gulpfile.reh.js#L128
-RUN echo 'target="30.5.1"' > $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/.npmrc; \
+RUN echo 'target="30.5.1"' >> $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/.npmrc; \
     echo 'ms_build_id="10306386"' >> $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/.npmrc; \
+    echo 'runtime="electron"' >> $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/.npmrc; \
     echo 'build_from_source="true"' >> $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/.npmrc; \
     echo 'legacy-peer-deps="true"' >> $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/.npmrc; \
-    echo 'target="20.16.0"' > $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/remote/.npmrc; \
+    echo 'timeout=180000' >> $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/.npmrc; \
+    echo 'target="20.16.0"' >> $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/remote/.npmrc; \
     echo 'ms_build_id="289487"' >> $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/remote/.npmrc; \
     echo 'build_from_source="true"' >> $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/remote/.npmrc; \
     echo 'legacy-peer-deps="true"' >> $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/remote/.npmrc;
 
+RUN set -x; \
+    NODE_ARCH=$(echo "console.log(process.arch)" | node) \
+    && NODE_VERSION=$(cat $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/remote/.npmrc | grep target | cut -d '=' -f 2 | tr -d '"') \
+    && echo "#####>> Arch & Version: $NODE_ARCH; $NODE_VERSION <<#####" \
+    # cache node from this image to avoid to grab it from within the build
+    && mkdir -p $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/.build/node/v${NODE_VERSION}/linux-${NODE_ARCH} \
+    && echo "caching $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/.build/node/v${NODE_VERSION}/linux-${NODE_ARCH}/node"; \
+    cp /usr/bin/node $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/.build/node/v${NODE_VERSION}/linux-${NODE_ARCH}/node; \
+    echo "########################################################path"; \
+    # add bin folder to path to resolve gulp and other binaries
+    export PATH=${PATH}:$REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/node_modules/.bin; \
+    echo $PATH
+
 # begin of module list generated by sync.sh
-RUN cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/ && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/build && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/che-activity-tracker && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/che-api && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/che-commands && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/che-port && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/che-remote && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/che-resource-monitor && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/che-terminal && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/che-github-authentication && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/configuration-editing && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/css-language-features && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/css-language-features/server && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/debug-auto-launch && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/debug-server-ready && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/emmet && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/extension-editing && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/git && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/git-base && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/github && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/github-authentication && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/grunt && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/gulp && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/html-language-features && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/html-language-features/server && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/ipynb && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/jake && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/json-language-features && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/json-language-features/server && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/markdown-language-features && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/markdown-math && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/media-preview && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/merge-conflict && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/microsoft-authentication && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/notebook-renderers && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/npm && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/php-language-features && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/references-view && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/search-result && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/simple-browser && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/tunnel-forwarding && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/typescript-language-features && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/vscode-api-tests && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/vscode-colorize-tests && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/vscode-test-resolver && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/remote && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/remote/web && npm install \
-    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/.vscode/extensions/vscode-selfhost-test-provider && npm install 
+RUN cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/ && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/build && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/che-activity-tracker && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/che-api && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/che-commands && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/che-port && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/che-remote && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/che-resource-monitor && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/che-terminal && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/che-github-authentication && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/configuration-editing && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/css-language-features && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/css-language-features/server && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/debug-auto-launch && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/debug-server-ready && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/emmet && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/extension-editing && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/git && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/git-base && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/github && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/github-authentication && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/grunt && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/gulp && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/html-language-features && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/html-language-features/server && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/ipynb && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/jake && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/json-language-features && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/json-language-features/server && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/markdown-language-features && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/markdown-math && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/media-preview && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/merge-conflict && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/microsoft-authentication && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/notebook-renderers && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/npm && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/php-language-features && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/references-view && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/search-result && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/simple-browser && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/tunnel-forwarding && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/typescript-language-features && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/vscode-api-tests && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/vscode-colorize-tests && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/vscode-test-resolver && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/remote && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/remote/web && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/.vscode/extensions/vscode-selfhost-test-provider && npm install --legacy-peer-deps --unsafe-perm \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/.vscode/extensions/vscode-selfhost-import-aid && npm install --legacy-peer-deps --unsafe-perm
 # end of module list generated by sync.sh
 
 # hadolint ignore=SC3045
@@ -392,22 +403,8 @@ RUN echo "$(ulimit -a)"
 # hadolint ignore=SC2086,DL4006
 RUN set -x; \
     NODE_ARCH=$(echo "console.log(process.arch)" | node) \
-    && NODE_VERSION=$(cat $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/remote/.npmrc | grep target | cut -d '=' -f 2 | tr -d '"') \
-    && echo "#####>> Arch & Version: $NODE_ARCH; $NODE_VERSION <<#####" \
-    # cache node from this image to avoid to grab it from within the build
-    && mkdir -p $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/.build/node/v${NODE_VERSION}/linux-${NODE_ARCH} \
-    && echo "caching $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/.build/node/v${NODE_VERSION}/linux-${NODE_ARCH}/node"; \
-    cp /usr/bin/node $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/.build/node/v${NODE_VERSION}/linux-${NODE_ARCH}/node; \
-
-    echo "########################################################path"; \
-    # add bin folder to path to resolve gulp and other binaries
-    export PATH=${PATH}:$REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/node_modules/.bin; \
-    echo $PATH; \
-
-    NODE_OPTIONS="--max_old_space_size=8500" ./node_modules/.bin/gulp vscode-reh-web-linux-${NODE_ARCH}-min -LLLL \
-    && cp -r ../vscode-reh-web-linux-${NODE_ARCH} /checode \
-    # cache libbrotli from this image to provide it to a user's container
-    && mkdir -p /checode/ld_libs && find /usr/lib64 -name 'libbrotli*' 2>/dev/null | xargs -I {} cp -t /checode/ld_libs {}
+    && NODE_OPTIONS="--max_old_space_size=8500" ./node_modules/.bin/gulp vscode-reh-web-linux-${NODE_ARCH}-min -LLLL \
+    && cp -r ../vscode-reh-web-linux-${NODE_ARCH} /checode
 
 RUN chmod a+x /checode/out/server-main.js \
     && chgrp -R 0 /checode && chmod -R g+rwX /checode
@@ -418,7 +415,6 @@ RUN npm install \
     && mkdir /checode/launcher \
     && cp -r out/src/*.js /checode/launcher \
     && chgrp -R 0 /checode && chmod -R g+rwX /checode
-
 
 #########################################################################
 ############################# BUILD 3: machineexec#######################
