@@ -153,7 +153,7 @@ addRipGrepLibrary() {
 
 addRipGrepToYaml() {
   #fetch post-install script for vscode ripgrep extension, in which we find the required version of ripgrep
-  VSCODE_RIPGREP_VERSION=$(cd "$TARGETDIR"/code; yarn list --frozen-lockfile --pattern vscode/ripgrep --depth=0 --flat | grep -o -E @vscode/ripgrep@\\S* | cut -d '@' -f 3)
+  VSCODE_RIPGREP_VERSION=$(cd "$TARGETDIR"/code; npm list @vscode/ripgrep --depth=0 | grep -o -E @vscode/ripgrep@\\S* | cut -d '@' -f 3)
   # cache directory in brew.Dockerfile must be updated according to this version
   sed -r -e "s|(COPY artifacts/ripgrep-\*.tar.gz /tmp/vscode-ripgrep-cache-).*|\1${VSCODE_RIPGREP_VERSION}/|" -i "${TARGETDIR}/build/dockerfiles/brew.Dockerfile"
   POST_INSTALL_SCRIPT=$(curl -sSL https://raw.githubusercontent.com/microsoft/vscode-ripgrep/v${VSCODE_RIPGREP_VERSION}/lib/postinstall.js)
