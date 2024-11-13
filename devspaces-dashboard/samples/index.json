@@ -114,7 +114,7 @@
       "Ansible",
       "Molecule"
     ],
-    "url": "https://github.com/devspaces-samples/ansible-devspaces-demo/tree/devspaces-3-rhel-8",
+    "url": "https://github.com/redhat-developer-demos/ansible-devspaces-demo/tree/devspaces-3-rhel-8",
     "icon": {
       "mediatype": "image/svg+xml",
       "base64data": "PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9Ii05Ny42MiAtMTQ3LjI0IDY0IDY0IiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiPjxwYXRoIGQ9Ik0tMzMuNjItMTE1LjI0YzAgMTcuNjc0LTE0LjMyNiAzMi0zMiAzMnMtMzItMTQuMzI2LTMyLTMyIDE0LjMyOC0zMiAzMi0zMiAzMiAxNC4zMjggMzIgMzIiIGZpbGw9IiMxYTE5MTgiLz48cGF0aCBkPSJNLTY1LjA4LTEyNy42OTJsOC4yOCAyMC40MzgtMTIuNTA4LTkuODUzem0xNC43IDI1LjE0N0wtNjMuMTA4LTEzMy4yYy0uMzY0LS44ODQtMS4xLTEuMzUyLTEuOTczLTEuMzUycy0xLjY2NC40NjgtMi4wMjggMS4zNTJMLTgxLjEtOTkuNTc2aDQuNzgzbDUuNTM0LTEzLjg2MyAxNi41MTUgMTMuMzQzYy42NjQuNTM3IDEuMTQ0Ljc4IDEuNzY3Ljc4IDEuMjQ4IDAgMi4zMzgtLjkzNiAyLjMzOC0yLjI4NiAwLS4yMi0uMDc4LS41Ny0uMjE4LS45NDR6IiBmaWxsPSIjZmZmIi8+PC9zdmc+Cg=="
