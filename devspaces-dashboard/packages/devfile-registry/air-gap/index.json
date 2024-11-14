@@ -169,11 +169,11 @@
     },
     "project": {
       "zip": {
-        "filename": "devspaces-samples-ansible-devspaces-demo-devspaces-3-rhel-8.zip"
+        "filename": "redhat-developer-demos-ansible-devspaces-demo-devspaces-3-rhel-8.zip"
       }
     },
     "devfile": {
-      "filename": "devspaces-samples-ansible-devspaces-demo-devspaces-3-rhel-8-devfile.yaml"
+      "filename": "redhat-developer-demos-ansible-devspaces-demo-devspaces-3-rhel-8-devfile.yaml"
     }
   },
   {
