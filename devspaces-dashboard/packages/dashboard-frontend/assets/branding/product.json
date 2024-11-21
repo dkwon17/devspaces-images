@@ -1,7 +1,7 @@
 {
   "title": "Red Hat OpenShift Dev Spaces ",
   "name": "Red Hat OpenShift Dev Spaces",
-  "productVersion": "3.18 @ fbc07b #592 :: Eclipse Che Dashboard 7.95.0 @ d247",
+  "productVersion": "3.18 @ 710ab3 #593 :: Eclipse Che Dashboard 7.96.0 @ e9326",
   "logoFile": "che-logo.svg",
   "logoTextFile": "che-logo-text.svg",
   "links": [
@@ -24,8 +24,7 @@
     "converting": "https://devfile.io/docs/devfile/2.1.0/user-guide/migrating-to-devfile-v2/",
     "general": "https://docs.redhat.com/en/documentation/red_hat_openshift_dev_spaces/3.18/",
     "storageTypes": "https://docs.redhat.com/en/documentation/red_hat_openshift_dev_spaces/3.18/html-single/administration_guide#configuring-storage",
-    "webSocketTroubleshooting": "https://docs.redhat.com/en/documentation/red_hat_openshift_dev_spaces/3.18/html-single/user_guide#troubleshooting-network-problems",
-    "startWorkspaceFromGit": "https://docs.redhat.com/en/documentation/red_hat_openshift_dev_spaces/latest/html/user_guide/getting-started-with-devspaces#starting-a-workspace-from-a-git-repository-url"
+    "webSocketTroubleshooting": "https://docs.redhat.com/en/documentation/red_hat_openshift_dev_spaces/3.18/html-single/user_guide#troubleshooting-network-problems"
   },
   "configuration": {
     "cheCliTool": "dsc"
