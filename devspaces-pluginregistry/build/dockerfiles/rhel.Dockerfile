@@ -12,7 +12,7 @@
 #
 
 # https://registry.access.redhat.com/rhel9-2-els/rhel
-FROM registry.redhat.io/rhel9-2-els/rhel:9.2-1362
+FROM registry.redhat.io/rhel9-2-els/rhel:9.2-1405
 USER 0
 WORKDIR /
 
