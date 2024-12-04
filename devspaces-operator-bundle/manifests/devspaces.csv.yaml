@@ -58,8 +58,8 @@ metadata:
     capabilities: Seamless Upgrades
     categories: Developer Tools
     certified: "true"
-    containerImage: registry-proxy.engineering.redhat.com/rh-osbs/devspaces-operator:3.19
-    createdAt: "2024-11-28T13:28:31+00:00"
+    containerImage: registry.redhat.io/devspaces/operator:3.19
+    createdAt: "2024-12-04T22:49:53+00:00"
     description: Devfile v2 and v1 development solution, 1 instance per cluster, for
       portable, collaborative k8s workspaces.
     features.operators.openshift.io/cnf: "false"
@@ -914,23 +914,23 @@ spec:
                           fieldRef:
                             fieldPath: metadata.name
                       - name: RELATED_IMAGE_che_server
-                        value: registry-proxy.engineering.redhat.com/rh-osbs/devspaces-server-rhel8:3.19
+                        value: registry.redhat.io/devspaces/server-rhel8:3.19
                       - name: RELATED_IMAGE_dashboard
-                        value: registry-proxy.engineering.redhat.com/rh-osbs/devspaces-dashboard-rhel8:3.19
+                        value: registry.redhat.io/devspaces/dashboard-rhel8:3.19
                       - name: RELATED_IMAGE_editor_definition_che_code_latest_che_code_injector
-                        value: registry-proxy.engineering.redhat.com/rh-osbs/devspaces-code-rhel8:3.19
+                        value: registry.redhat.io/devspaces/code-rhel8:3.19
                       - name: RELATED_IMAGE_editor_definition_che_code_latest_che_code_runtime_description
-                        value: registry-proxy.engineering.redhat.com/rh-osbs/devspaces-udi-rhel8:3.19
+                        value: registry.redhat.io/devspaces/udi-rhel8:3.19
                       - name: RELATED_IMAGE_editor_definition_che_idea_latest_idea_rhel8
-                        value: registry-proxy.engineering.redhat.com/rh-osbs/devspaces-udi-rhel8:3.19
+                        value: registry.redhat.io/devspaces/udi-rhel8:3.19
                       - name: RELATED_IMAGE_editor_definition_che_idea_latest_idea_rhel8_injector
-                        value: registry-proxy.engineering.redhat.com/rh-osbs/devspaces-idea-rhel8:3.19
+                        value: registry.redhat.io/devspaces/idea-rhel8:3.19
                       - name: RELATED_IMAGE_gateway_authentication_sidecar
                         value: registry.redhat.io/openshift4/ose-oauth-proxy:v4.14
                       - name: RELATED_IMAGE_gateway_authorization_sidecar
                         value: registry.redhat.io/openshift4/ose-kube-rbac-proxy:v4.14
                       - name: RELATED_IMAGE_plugin_registry
-                        value: registry-proxy.engineering.redhat.com/rh-osbs/devspaces-pluginregistry-rhel8:3.19
+                        value: registry.redhat.io/devspaces/pluginregistry-rhel8:3.19
                       - name: RELATED_IMAGE_pvc_jobs
                         value: registry.redhat.io/ubi8/ubi-minimal:8.8
                       - name: RELATED_IMAGE_sample_ansible_demo_tooling_container
@@ -938,18 +938,18 @@ spec:
                       - name: RELATED_IMAGE_sample_encoded_cmVnaXN0cnkucmVkaGF0LmlvL2RldnNwYWNlcy91ZGktcmhlbDg6My4xNwo____
                         value: registry.redhat.io/devspaces/udi-rhel8:3.17
                       - name: RELATED_IMAGE_sample_encoded_cmVnaXN0cnkucmVkaGF0LmlvL2RldnNwYWNlcy91ZGktcmhlbDg6My4xOQo____
-                        value: registry-proxy.engineering.redhat.com/rh-osbs/devspaces-udi-rhel8:3.19
+                        value: registry.redhat.io/devspaces/udi-rhel8:3.19
                       - name: RELATED_IMAGE_sample_encoded_cmVnaXN0cnkucmVkaGF0LmlvL3Joc2NsL21vbmdvZGItMzYtcmhlbDc6MS01MAo____
                         value: registry.redhat.io/rhscl/mongodb-36-rhel7:1-50
                       - name: RELATED_IMAGE_single_host_gateway
-                        value: registry-proxy.engineering.redhat.com/rh-osbs/devspaces-traefik-rhel8:3.19
+                        value: registry.redhat.io/devspaces/traefik-rhel8:3.19
                       - name: RELATED_IMAGE_single_host_gateway_config_sidecar
-                        value: registry-proxy.engineering.redhat.com/rh-osbs/devspaces-configbump-rhel8:3.19
+                        value: registry.redhat.io/devspaces/configbump-rhel8:3.19
                       - name: WATCH_NAMESPACE
                         valueFrom:
                           fieldRef:
                             fieldPath: metadata.annotations['olm.targetNamespaces']
-                    image: registry-proxy.engineering.redhat.com/rh-osbs/devspaces-operator:3.19
+                    image: registry.redhat.io/devspaces/operator:3.19
                     imagePullPolicy: Always
                     livenessProbe:
                       failureThreshold: 10
