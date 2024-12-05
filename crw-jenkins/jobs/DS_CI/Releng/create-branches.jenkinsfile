@@ -3,8 +3,8 @@
 // PARAMETERS for this pipeline:
 //  DS_VERSION = 3.5
 //  DS_VERSION_NEXT = 3.6
-//  NEW_BRANCH = "devspaces-3.y-rhel-8" // branch to create
-//  MIDSTM_BRANCH = "devspaces-3-rhel-8" // redhat-developer/devspaces branch to use as source of the new branches
+//  NEW_BRANCH = "devspaces-3.y-rhel-9" // branch to create
+//  MIDSTM_BRANCH = "devspaces-3-rhel-9" // redhat-developer/devspaces branch to use as source of the new branches
 //  CLEAN_ON_FAILURE = "true"
 
 def List GH_REPOS = [

@@ -1,6 +1,6 @@
 import groovy.json.JsonSlurper
 
-def curlCMD = "https://raw.githubusercontent.com/redhat-developer/devspaces/devspaces-3-rhel-8/dependencies/job-config.json".toURL().text
+def curlCMD = "https://raw.githubusercontent.com/redhat-developer/devspaces/devspaces-3-rhel-9/dependencies/job-config.json".toURL().text
 
 def jsonSlurper = new JsonSlurper();
 def config = jsonSlurper.parseText(curlCMD);
@@ -23,7 +23,7 @@ for (JB in JOB_BRANCHES) {
             disabled(config.Jobs.pluginregistry[JB].disabled) // on reload of job, disable to avoid churn
             UPSTM_NAME="devspaces-vscode-extensions"
             SOURCE_REPO="redhat-developer/" + UPSTM_NAME
-            SOURCE_BRANCH="devspaces-" + JOB_BRANCH.replaceAll(".x","") + "-rhel-8"
+            SOURCE_BRANCH="devspaces-" + JOB_BRANCH.replaceAll(".x","") + "-rhel-9"
 
             //get list of plugins for description
             pluginCMD = ("https://raw.githubusercontent.com/redhat-developer/devspaces-vscode-extensions/" + SOURCE_BRANCH + "/plugin-config.json").toURL().text

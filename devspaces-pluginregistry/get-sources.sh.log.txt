@@ -1808,7 +1808,7 @@ STEP 11/14: COPY /openvsx-sync.json /openvsx-server/
 STEP 12/14: COPY /build/scripts/download_vsix.sh /tmp
 --> fbae180267ef
 STEP 13/14: RUN     branch=$(cat /current_branch) &&     /tmp/download_vsix.sh -b $branch && mv /tmp/vsix /openvsx-server &&     rm /current_branch
-Scripts branch=devspaces-3-rhel-8
+Scripts branch=devspaces-3-rhel-9
 Che Code version=1.93.0
 Downloading https://open-vsx.org/api/donjayamanne/githistory/0.6.20/file/donjayamanne.githistory-0.6.20.vsix into donjayamanne folder...
 [1m

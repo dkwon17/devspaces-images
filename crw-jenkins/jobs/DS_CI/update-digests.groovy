@@ -1,6 +1,6 @@
 import groovy.json.JsonSlurper
 
-def curlCMD = "https://raw.githubusercontent.com/redhat-developer/devspaces/devspaces-3-rhel-8/dependencies/job-config.json".toURL().text
+def curlCMD = "https://raw.githubusercontent.com/redhat-developer/devspaces/devspaces-3-rhel-9/dependencies/job-config.json".toURL().text
 
 def jsonSlurper = new JsonSlurper();
 def config = jsonSlurper.parseText(curlCMD);
@@ -18,14 +18,14 @@ for (JB in JOB_BRANCHES) {
     }
     if (FILE_CHECK) {
         JOB_BRANCH=""+JB
-        MIDSTM_BRANCH="devspaces-" + JOB_BRANCH.replaceAll(".x","") + "-rhel-8"
+        MIDSTM_BRANCH="devspaces-" + JOB_BRANCH.replaceAll(".x","") + "-rhel-9"
         jobPath="${FOLDER_PATH}/${ITEM_NAME}_" + JOB_BRANCH
         pipelineJob(jobPath){
             disabled(config."Management-Jobs"."update-digests"[JB].disabled) // on reload of job, disable to avoid churn
             description('''
 This job will cause the <a href=../operator-bundle_''' + JOB_BRANCH + '''>operator-bundle_''' + JOB_BRANCH + '''</a> job to run, rebuilding if any new images 
 are found in <a href=https://quay.io/devspaces/>quay.io/devspaces/</a> using 
-<a href=https://github.com/redhat-developer/devspaces/blob/devspaces-3-rhel-8/product/getLatestImageTags.sh>
+<a href=https://github.com/redhat-developer/devspaces/blob/devspaces-3-rhel-9/product/getLatestImageTags.sh>
 ./getLatestTags.sh -b ''' + MIDSTM_BRANCH + ''' --quay --hide</a>.
 <p>
   Results:
@@ -34,7 +34,7 @@ are found in <a href=https://quay.io/devspaces/>quay.io/devspaces/</a> using
 </ul>
 
 <p> If this job is ever disabled and you want to update the LATEST_IMAGES files yourself, run 
-  <a href=https://github.com/redhat-developer/devspaces/blob/devspaces-''' + JOB_BRANCH + '''-rhel-8/dependencies/LATEST_IMAGES.sh>LATEST_IMAGES.sh --commit</a>
+  <a href=https://github.com/redhat-developer/devspaces/blob/devspaces-''' + JOB_BRANCH + '''-rhel-9/dependencies/LATEST_IMAGES.sh>LATEST_IMAGES.sh --commit</a>
             ''')
 
             properties {

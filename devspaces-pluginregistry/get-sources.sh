@@ -118,8 +118,8 @@ if [[ ${PULL_ASSETS} -eq 1 ]]; then
 	sudo rm -fr ${tmpDir}
 
 	SCRIPT_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
-	if [[ $SCRIPT_BRANCH != "devspaces-3."*"-rhel-8" ]]; then
-		SCRIPT_BRANCH="devspaces-3-rhel-8"
+	if [[ $SCRIPT_BRANCH != "devspaces-3."*"-rhel-9" ]]; then
+		SCRIPT_BRANCH="devspaces-3-rhel-9"
 	fi
 
 	# save current branch name to the temporary file, it will be used in the openvsx-builder.Dockerfile build
@@ -167,7 +167,7 @@ if [[ ${TAR_DIFF} ]] || [[ ${PULL_ASSETS} -eq 1 ]]; then
 		git status || true
 		gitbranch="$(git rev-parse --abbrev-ref HEAD)"
 		target=${gitbranch}-containers-candidate
-		if [[ $scratchFlag == "--scratch" ]]; then target=devspaces-3-rhel-8-containers-candidate; fi
+		if [[ $scratchFlag == "--scratch" ]]; then target=devspaces-3-rhel-9-containers-candidate; fi
 		repo="$(git remote -v | grep origin | head -1 | sed -r -e "s#.+/containers/(.+) \(fetch.+#\1#")"
 		sha="$(git rev-parse HEAD)"
 		tmpfile=$(mktemp) && brew container-build ${target} git+https://pkgs.devel.redhat.com/git/containers/${repo}#${sha} --git-branch ${gitbranch} ${scratchFlag} --nowait 2>/dev/null | tee 2>&1 "${tmpfile}"
@@ -185,7 +185,7 @@ else
 		git status || true
 		gitbranch="$(git rev-parse --abbrev-ref HEAD)"
 		target=${gitbranch}-containers-candidate
-		if [[ $scratchFlag == "--scratch" ]]; then target=devspaces-3-rhel-8-containers-candidate; fi
+		if [[ $scratchFlag == "--scratch" ]]; then target=devspaces-3-rhel-9-containers-candidate; fi
 		repo="$(git remote -v | grep origin | head -1 | sed -r -e "s#.+/containers/(.+) \(fetch.+#\1#")"
 		sha="$(git rev-parse HEAD)"
 		tmpfile=$(mktemp) && brew container-build ${target} git+https://pkgs.devel.redhat.com/git/containers/${repo}#${sha} --git-branch ${gitbranch} ${scratchFlag} --nowait 2>/dev/null | tee 2>&1 "${tmpfile}"

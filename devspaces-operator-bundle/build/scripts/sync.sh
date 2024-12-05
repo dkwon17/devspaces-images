@@ -49,23 +49,23 @@ if [[ ! -d "${TARGETDIR}" ]]; then usage; fi
 if [[ "${CSV_VERSION}" == "3.y.0" ]]; then usage; fi
 
 # if not set via commandline, compute CSV_VERSION_PREV
-# from https://raw.githubusercontent.com/redhat-developer/devspaces/devspaces-3-rhel-8/dependencies/job-config.json
+# from https://raw.githubusercontent.com/redhat-developer/devspaces/devspaces-3-rhel-9/dependencies/job-config.json
 # shellcheck disable=SC2086
 if [[ -z "${CSV_VERSION_PREV}" ]]; then
     
-    MIDSTM_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "devspaces-3-rhel-8")
-    if [[ ${MIDSTM_BRANCH} != "devspaces-"*"-rhel-"* ]]; then MIDSTM_BRANCH="devspaces-3-rhel-8"; fi
+    MIDSTM_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "devspaces-3-rhel-9")
+    if [[ ${MIDSTM_BRANCH} != "devspaces-"*"-rhel-"* ]]; then MIDSTM_BRANCH="devspaces-3-rhel-9"; fi
     # load the latest job-config.json, not the branched version; this ensures we get CVE updates (CRW-4324)
-    configjson="$(curl -sSLo- "https://raw.githubusercontent.com/redhat-developer/devspaces/devspaces-3-rhel-8/dependencies/job-config.json")"
+    configjson="$(curl -sSLo- "https://raw.githubusercontent.com/redhat-developer/devspaces/devspaces-3-rhel-9/dependencies/job-config.json")"
     if [[ $configjson == *"404"* ]] || [[ $configjson == *"Not Found"* ]]; then 
-        echo "[ERROR] Could not load https://raw.githubusercontent.com/redhat-developer/devspaces/devspaces-3-rhel-8/dependencies/job-config.json"
+        echo "[ERROR] Could not load https://raw.githubusercontent.com/redhat-developer/devspaces/devspaces-3-rhel-9/dependencies/job-config.json"
         echo "[ERROR] Please use -p flag to set CSV_VERSION_PREV"
         exit 1
     fi
-    if [[ $MIDSTM_BRANCH == "devspaces-3-rhel-8" ]]; then
+    if [[ $MIDSTM_BRANCH == "devspaces-3-rhel-9" ]]; then
         DS_VERSION="$(echo "$configjson" | jq -r '.Version')"
     else 
-        DS_VERSION=${MIDSTM_BRANCH/devspaces-/}; DS_VERSION=${DS_VERSION//-rhel-8}
+        DS_VERSION=${MIDSTM_BRANCH/devspaces-/}; DS_VERSION=${DS_VERSION//-rhel-9}
     fi
     
     if [[ -z "${CSV_VERSION_PREV}" ]]; then
@@ -217,13 +217,13 @@ CSVFILE="${TARGETDIR}"/manifests/devspaces.csv.yaml
 # transform into Brew-friendly version of CSV
 # OPTION 1: only for images changed in this respin (required for subsequent GAs of 3.y.z)
 # sed -r -i "${CSVFILE}" \
-  # -e "s@registry.redhat.io/devspaces/devspaces-rhel8-operator@registry-proxy.engineering.redhat.com/rh-osbs/devspaces-operator@g"
+  # -e "s@registry.redhat.io/devspaces/devspaces-rhel9-operator@registry-proxy.engineering.redhat.com/rh-osbs/devspaces-operator@g"
   # ...
 # OPTION 2: use images from reg-proxy, which could be older than the RHEC Freshmaker updates (required for initial GA of 3.y.0)
 # CRW-4077 : DO NOT change image references if they have a @sha256: reference, only :3.y
 sed -i "${CSVFILE}" -r \
   -e "s%(registry.redhat.io|quay.io)/devspaces/(.+:${DS_VERSION})%registry-proxy.engineering.redhat.com/rh-osbs/devspaces-\2%g" \
-  -e "s@devspaces-rhel8-operator@operator@g" \
+  -e "s@devspaces-rhel9-operator@operator@g" \
   -e "s@:latest@:${DS_VERSION}@g"
 
 # date in CSV will be updated only if there were any changes in CSV

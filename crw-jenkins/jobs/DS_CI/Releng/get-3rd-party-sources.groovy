@@ -1,6 +1,6 @@
 import groovy.json.JsonSlurper
 
-def curlCMD = "https://raw.githubusercontent.com/redhat-developer/devspaces/devspaces-3-rhel-8/dependencies/job-config.json".toURL().text
+def curlCMD = "https://raw.githubusercontent.com/redhat-developer/devspaces/devspaces-3-rhel-9/dependencies/job-config.json".toURL().text
 
 def jsonSlurper = new JsonSlurper();
 def config = jsonSlurper.parseText(curlCMD);
@@ -22,7 +22,7 @@ for (String JOB_BRANCH : JOB_BRANCHES) {
         // keep job disabled until we explicitly need it
         disabled(true)
 
-        MIDSTM_BRANCH="devspaces-" + JOB_BRANCH.replaceAll(".x","") + "-rhel-8"
+        MIDSTM_BRANCH="devspaces-" + JOB_BRANCH.replaceAll(".x","") + "-rhel-9"
 
         description('''
 Collect sources from pkgs.devel and vsix files and rsync to spmm-util so they can be published as part of a GA release. 

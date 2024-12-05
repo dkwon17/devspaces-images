@@ -176,7 +176,7 @@ RUN \
     chgrp -R 0 /var/lib/pgsql /var/lib/pgsql/15 /var/lib/pgsql/data /var/lib/pgsql/backups && \
     mv /var/lib/pgsql/15/data/database /var/lib/pgsql/15/data/old
 
-ARG DS_BRANCH=devspaces-3-rhel-8
+ARG DS_BRANCH=devspaces-3-rhel-9
 ENV DS_BRANCH=${DS_BRANCH}
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
@@ -185,7 +185,7 @@ ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 ENV SUMMARY="Red Hat OpenShift Dev Spaces pluginregistry container" \
     DESCRIPTION="Red Hat OpenShift Dev Spaces pluginregistry container" \
     PRODNAME="devspaces" \
-    COMPNAME="pluginregistry-rhel8"
+    COMPNAME="pluginregistry-rhel9"
 LABEL summary="$SUMMARY" \
       description="$DESCRIPTION" \
       io.k8s.description="$DESCRIPTION" \

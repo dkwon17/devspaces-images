@@ -81,14 +81,14 @@ rm -f /tmp/rsync-excludes
 
 # get job-config.json
 SCRIPTS_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
-if [[ $SCRIPTS_BRANCH != "devspaces-3."*"-rhel-8" ]]; then SCRIPTS_BRANCH="devspaces-3-rhel-8"; fi
+if [[ $SCRIPTS_BRANCH != "devspaces-3."*"-rhel-9" ]]; then SCRIPTS_BRANCH="devspaces-3-rhel-9"; fi
 configjson=$(curl -sSLo- https://raw.githubusercontent.com/redhat-developer/devspaces/${SCRIPTS_BRANCH}/dependencies/job-config.json)
 
 ### Prepare airgap samples
 SRC_SAMPLES_JSON="${TARGETDIR}/samples/index.json"
 SAMPLES_OUTPUT_DIR="${TARGETDIR}/packages/devfile-registry/air-gap"
 # Set the correct tree in the samples index.json
-sed -i "s|tree/devspaces-[0-9.]-rhel-8|tree/${SCRIPTS_BRANCH}|g" "${SRC_SAMPLES_JSON}"
+sed -i "s|tree/devspaces-[0-9.]-rhel-9|tree/${SCRIPTS_BRANCH}|g" "${SRC_SAMPLES_JSON}"
 # Copy new samples
 rm -rf "${SAMPLES_OUTPUT_DIR}"
 . "${TARGETDIR}/scripts/airgap.sh" -i "${SRC_SAMPLES_JSON}" -o "${SAMPLES_OUTPUT_DIR}"

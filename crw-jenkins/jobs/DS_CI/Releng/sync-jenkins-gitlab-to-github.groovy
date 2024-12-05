@@ -1,6 +1,6 @@
 def JOB_BRANCHES = ["3.x"] // only one job
 for (String JOB_BRANCH : JOB_BRANCHES) {
-    MIDSTM_BRANCH="devspaces-3-rhel-8"
+    MIDSTM_BRANCH="devspaces-3-rhel-9"
     jobPath="${FOLDER_PATH}/${ITEM_NAME}"
     pipelineJob(jobPath){
         disabled(false)

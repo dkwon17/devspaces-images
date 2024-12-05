@@ -1,6 +1,6 @@
 import groovy.json.JsonSlurper
 
-def curlCMD = "https://raw.githubusercontent.com/redhat-developer/devspaces/devspaces-3-rhel-8/dependencies/job-config.json".toURL().text
+def curlCMD = "https://raw.githubusercontent.com/redhat-developer/devspaces/devspaces-3-rhel-9/dependencies/job-config.json".toURL().text
 
 def jsonSlurper = new JsonSlurper();
 def config = jsonSlurper.parseText(curlCMD);
@@ -18,7 +18,7 @@ for (JB in JOB_BRANCHES) {
     }
     if (FILE_CHECK) {
         JOB_BRANCH=""+JB
-        MIDSTM_BRANCH="devspaces-" + JOB_BRANCH.replaceAll(".x","") + "-rhel-8"
+        MIDSTM_BRANCH="devspaces-" + JOB_BRANCH.replaceAll(".x","") + "-rhel-9"
         jobPath="${FOLDER_PATH}/${ITEM_NAME}_" + JOB_BRANCH
         pipelineJob(jobPath){
             disabled(config.Jobs.pluginregistry[JB].disabled) // on reload of job, disable to avoid churn
@@ -33,8 +33,8 @@ for (JB in JOB_BRANCHES) {
 
             SOURCE_BRANCH=""+config.Jobs.pluginregistry[JB].upstream_branch[0];
             if (!BRANCH_CHECK) {
-                //pluginregistry uses devspaces-3.yy-rhel-8 so if branch doesn't exist use devspaces-3-rhel-8
-                SOURCE_BRANCH="devspaces-3-rhel-8"
+                //pluginregistry uses devspaces-3.yy-rhel-9 so if branch doesn't exist use devspaces-3-rhel-9
+                SOURCE_BRANCH="devspaces-3-rhel-9"
             }
 
             description('''
@@ -50,7 +50,7 @@ Artifact builder + sync job; triggers brew after syncing
 <p>This job will <a href=https://issues.redhat.com/browse/CRW-3178>trigger</a>:
 <ul>
 <li>for changes to 
-    <a href=https://github.com/redhat-developer/devspaces/blob/devspaces-3-rhel-8/dependencies/che-plugin-registry>devspaces/che-plugin-registry</a>, </li>
+    <a href=https://github.com/redhat-developer/devspaces/blob/devspaces-3-rhel-9/dependencies/che-plugin-registry>devspaces/che-plugin-registry</a>, </li>
 <li>causing a rebuild of the <a href=https://redhat-developer.github.io/devspaces/che-plugin-registry/next/x86_64/v3/plugins/>redhat-developer.github.io/devspaces/che-plugin-registry</a>.</li>
 </ul></p>
 

@@ -1,6 +1,6 @@
 import groovy.json.JsonSlurper
 
-def curlCMD = "https://raw.githubusercontent.com/redhat-developer/devspaces/devspaces-3-rhel-8/dependencies/job-config.json".toURL().text
+def curlCMD = "https://raw.githubusercontent.com/redhat-developer/devspaces/devspaces-3-rhel-9/dependencies/job-config.json".toURL().text
 
 def jsonSlurper = new JsonSlurper();
 def config = jsonSlurper.parseText(curlCMD);
@@ -20,20 +20,20 @@ for (String JOB_BRANCH : JOB_BRANCHES) {
         // keep job disabled until we explicitly need it
         disabled(true)
 
-        MIDSTM_BRANCH="devspaces-3-rhel-8"
-        NEW_BRANCH="devspaces-"+PREV_VERSION+"-rhel-8"
+        MIDSTM_BRANCH="devspaces-3-rhel-9"
+        NEW_BRANCH="devspaces-"+PREV_VERSION+"-rhel-9"
 
         description('''
-This job is meant to be run after upstream 7.yy.x branches are available to start the new devspaces-3.y-rhel-8 github branches for the upcoming release.
+This job is meant to be run after upstream 7.yy.x branches are available to start the new devspaces-3.y-rhel-9 github branches for the upcoming release.
 <p>
-See <a href=https://github.com/redhat-developer/devspaces/blob/devspaces-3-rhel-8/product/tagRelease.sh>
-https://github.com/redhat-developer/devspaces/blob/devspaces-3-rhel-8/product/tagRelease.sh</a>
+See <a href=https://github.com/redhat-developer/devspaces/blob/devspaces-3-rhel-9/product/tagRelease.sh>
+https://github.com/redhat-developer/devspaces/blob/devspaces-3-rhel-9/product/tagRelease.sh</a>
 
 <p>Pass in values like these to create/update the ''' + PREV_VERSION + ''' and 3.x (''' + JOB_BRANCH + ''') branches, including devfiles in sample projects:
 <ul>
     <li>DS_VERSION = ''' + PREV_VERSION + '''</li>
-    <li>NEW_BRANCH = devspaces-''' + PREV_VERSION + '''-rhel-8</li>
-    <li>MIDSTM_BRANCH = devspaces-3-rhel-8 (''' + JOB_BRANCH + ''')</li>
+    <li>NEW_BRANCH = devspaces-''' + PREV_VERSION + '''-rhel-9</li>
+    <li>MIDSTM_BRANCH = devspaces-3-rhel-9 (''' + JOB_BRANCH + ''')</li>
 </ul>
 </p>
 

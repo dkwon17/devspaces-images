@@ -1,6 +1,6 @@
 import groovy.json.JsonSlurper
 
-def curlCMD = "https://raw.githubusercontent.com/redhat-developer/devspaces/devspaces-3-rhel-8/dependencies/job-config.json".toURL().text
+def curlCMD = "https://raw.githubusercontent.com/redhat-developer/devspaces/devspaces-3-rhel-9/dependencies/job-config.json".toURL().text
 
 def jsonSlurper = new JsonSlurper();
 def config = jsonSlurper.parseText(curlCMD);
@@ -44,7 +44,7 @@ This job is used to copy the latest DWO bundle + its operands to
         parameters{
             stringParam("DWO_VERSION",DWO_VERSION,"version of DWO to use when searching for latest IIB or operator-bundle to copy to Quay.io")
             stringParam("EXTRA_FLAGS","-v --next",'''Pass additional flags to 
-            <a href=https://github.com/redhat-developer/devspaces/blob/devspaces-3-rhel-8/product/copyDWOToQuay.sh>product/copyDWOToQuay.sh</a>
+            <a href=https://github.com/redhat-developer/devspaces/blob/devspaces-3-rhel-9/product/copyDWOToQuay.sh>product/copyDWOToQuay.sh</a>
             such as --next, --latest, or -v (verbose)''')
         }
 

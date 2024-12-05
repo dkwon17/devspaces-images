@@ -238,11 +238,11 @@ echo "<<<############### df -h start of sync repos #################"
           if (REPOS.contains("-udi")) { 
             def OPENSHIFT_CONTENT_SET_VERSION = sh( 
               script: '''
-curl -sSLo- https://raw.githubusercontent.com/redhat-developer/devspaces/devspaces-3-rhel-8/dependencies/job-config.json | jq -r '.Other.OPENSHIFT_CONTENT_SET_VERSION["''' + DS_VERSION + '''"]' 
+curl -sSLo- https://raw.githubusercontent.com/redhat-developer/devspaces/devspaces-3-rhel-9/dependencies/job-config.json | jq -r '.Other.OPENSHIFT_CONTENT_SET_VERSION["''' + DS_VERSION + '''"]' 
 ''', returnStdout: true).trim()
             def OCP_TOOLS_CONTENT_SET_VERSION = sh( 
               script: '''
-curl -sSLo- https://raw.githubusercontent.com/redhat-developer/devspaces/devspaces-3-rhel-8/dependencies/job-config.json | jq -r '.Other.OCP_TOOLS_CONTENT_SET_VERSION["''' + DS_VERSION + '''"]' 
+curl -sSLo- https://raw.githubusercontent.com/redhat-developer/devspaces/devspaces-3-rhel-9/dependencies/job-config.json | jq -r '.Other.OCP_TOOLS_CONTENT_SET_VERSION["''' + DS_VERSION + '''"]' 
 ''', returnStdout: true).trim() // @since 3.2
             if (OPENSHIFT_CONTENT_SET_VERSION?.trim() && !OPENSHIFT_CONTENT_SET_VERSION.equals("null") && 
                 OCP_TOOLS_CONTENT_SET_VERSION?.trim() && !OCP_TOOLS_CONTENT_SET_VERSION.equals("null")) {
@@ -304,7 +304,7 @@ rm -f /tmp/rsync-excludes
               sh('''#!/bin/bash -x
 yaml=${WORKSPACE}/targetdwn/''' + "${SYNC_REPOS[i]}" + '''/container.yaml
 UCYS=updateContainerYamlSHAs.sh
-curl -sSLo /tmp/${UCYS} https://raw.githubusercontent.com/redhat-developer/devspaces/devspaces-3-rhel-8/product/${UCYS} && chmod +x /tmp/${UCYS}
+curl -sSLo /tmp/${UCYS} https://raw.githubusercontent.com/redhat-developer/devspaces/devspaces-3-rhel-9/product/${UCYS} && chmod +x /tmp/${UCYS}
 if [[ $(grep 'remote_sources:' ${yaml}) ]]; then
   /tmp/${UCYS} -b "${MIDSTM_BRANCH}" "${yaml}"
 fi

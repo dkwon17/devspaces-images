@@ -89,7 +89,7 @@ find "${TARGETDIR}"/ -name "*.sh" -exec chmod +x {} \;
 
 # get job-config.json
 SCRIPTS_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
-if [[ $SCRIPTS_BRANCH != "devspaces-3."*"-rhel-8" ]]; then SCRIPTS_BRANCH="devspaces-3-rhel-8"; fi
+if [[ $SCRIPTS_BRANCH != "devspaces-3."*"-rhel-9" ]]; then SCRIPTS_BRANCH="devspaces-3-rhel-9"; fi
 configjson=$(curl -sSLo- https://raw.githubusercontent.com/redhat-developer/devspaces/${SCRIPTS_BRANCH}/dependencies/job-config.json)
 
 if [[ ! $TRAEFIK_VERSION ]]; then

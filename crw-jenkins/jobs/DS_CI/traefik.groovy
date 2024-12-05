@@ -1,6 +1,6 @@
 import groovy.json.JsonSlurper
 
-def curlCMD = "https://raw.githubusercontent.com/redhat-developer/devspaces/devspaces-3-rhel-8/dependencies/job-config.json".toURL().text
+def curlCMD = "https://raw.githubusercontent.com/redhat-developer/devspaces/devspaces-3-rhel-9/dependencies/job-config.json".toURL().text
 
 def jsonSlurper = new JsonSlurper();
 def config = jsonSlurper.parseText(curlCMD);
@@ -18,7 +18,7 @@ for (JB in JOB_BRANCHES) {
         println "No jenkins file found for " + JB
     }
     if (FILE_CHECK) {
-        MIDSTM_BRANCH="devspaces-" + JOB_BRANCH.replaceAll(".x","") + "-rhel-8"
+        MIDSTM_BRANCH="devspaces-" + JOB_BRANCH.replaceAll(".x","") + "-rhel-9"
         jobPath="${FOLDER_PATH}/${ITEM_NAME}_" + JOB_BRANCH
         pipelineJob(jobPath){
             disabled(config.Jobs.traefik[JB].disabled) // on reload of job, disable to avoid churn

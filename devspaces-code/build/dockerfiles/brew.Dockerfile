@@ -68,7 +68,7 @@ RUN echo "######################################################## /tmp/vscode-r
 
 
 # There're a few VS Code built-in extensions that are not in the VS Code repository, but hosted on GitHub.
-# https://github.com/redhat-developer/devspaces-images/blob/devspaces-3-rhel-8/devspaces-code/code/product.json#L35
+# https://github.com/redhat-developer/devspaces-images/blob/devspaces-3-rhel-9/devspaces-code/code/product.json#L35
 # By default, VS Code downloads them from GitHub during the build. That doen't work in OSBS due to offline mode.
 # We rebuild these VS Code built-ins with uploading vsix to download.devel to download them in OSBS environment (see fetch-artifacts-url.yaml).
 # Before trying to fetch the vsix from GitHub, VS Code looks for it in the local cache folder.
@@ -275,7 +275,7 @@ RUN echo "######################################################## /tmp/vscode-r
 
 
 # There're a few VS Code built-in extensions that are not in the VS Code repository, but hosted on GitHub.
-# https://github.com/redhat-developer/devspaces-images/blob/devspaces-3-rhel-8/devspaces-code/code/product.json#L35
+# https://github.com/redhat-developer/devspaces-images/blob/devspaces-3-rhel-9/devspaces-code/code/product.json#L35
 # By default, VS Code downloads them from GitHub during the build. That doen't work in OSBS due to offline mode.
 # We rebuild these VS Code built-ins with uploading vsix to download.devel to download them in OSBS environment (see fetch-artifacts-url.yaml).
 # Before trying to fetch the vsix from GitHub, VS Code looks for it in the local cache folder.
@@ -482,7 +482,7 @@ ENTRYPOINT ["/entrypoint.sh"]
 ENV SUMMARY="Red Hat OpenShift Dev Spaces with Microsoft Visual Studio Code - Open Source IDE" \
     DESCRIPTION="Red Hat OpenShift Dev Spaces with Microsoft Visual Studio Code - Open Source IDE" \
     PRODNAME="devspaces" \
-    COMPNAME="code-rhel8"
+    COMPNAME="code-rhel9"
 LABEL summary="$SUMMARY" \
       description="$DESCRIPTION" \
       io.k8s.description="$DESCRIPTION" \

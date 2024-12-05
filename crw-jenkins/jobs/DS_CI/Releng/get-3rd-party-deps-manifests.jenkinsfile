@@ -3,12 +3,12 @@
 import groovy.transform.Field
 
 // PARAMETERS for this pipeline:
-// MIDSTM_BRANCH="devspaces-3.y-rhel-8"
+// MIDSTM_BRANCH="devspaces-3.y-rhel-9"
 // TAG_RELEASE = true/false. If true, tag the repos; if false, proceed w/o tagging
 // CLEAN_ON_FAILURE = "true"
 
-def MIDSTM_BRANCHNEXT = "devspaces-3-rhel-8"
-def DWNSTM_BRANCH = MIDSTM_BRANCH // target branch in dist-git repo, eg., devspaces-3.y-rhel-8
+def MIDSTM_BRANCHNEXT = "devspaces-3-rhel-9"
+def DWNSTM_BRANCH = MIDSTM_BRANCH // target branch in dist-git repo, eg., devspaces-3.y-rhel-9
 def MVN_FLAGS="-Dmaven.repo.local=.repository/ -V -B -e"
 def buildNode = "x86_64-rhel8||ppc64le-rhel8"
 timeout(240) {

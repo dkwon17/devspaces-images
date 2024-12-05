@@ -68,7 +68,7 @@ CMD ["/usr/local/bin/rhel.entrypoint.sh"]
 ENV SUMMARY="Red Hat OpenShift Dev Spaces dashboard container" \
     DESCRIPTION="Red Hat OpenShift Dev Spaces dashboard container" \
     PRODNAME="devspaces" \
-    COMPNAME="dashboard-rhel8"
+    COMPNAME="dashboard-rhel9"
 LABEL summary="$SUMMARY" \
       description="$DESCRIPTION" \
       io.k8s.description="$DESCRIPTION" \

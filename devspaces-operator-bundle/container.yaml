@@ -26,12 +26,12 @@ operator_manifests:
   repo_replacements:
     # - registry: registry-proxy.engineering.redhat.com
     #   package_mappings:
-    #     devspaces-operator-container: rh-osbs/devspaces-rhel8-operator
-    #     devspaces-rhel8-operator-container: rh-osbs/devspaces-rhel8-operator
+    #     devspaces-operator-container: rh-osbs/devspaces-rhel9-operator
+    #     devspaces-rhel9-operator-container: rh-osbs/devspaces-rhel9-operator
     - registry: registry.redhat.io
       package_mappings:
-        # devspaces-operator-container: devspaces/devspaces-rhel8-operator
-        devspaces-rhel8-operator-container: devspaces/devspaces-rhel8-operator
+        # devspaces-operator-container: devspaces/devspaces-rhel9-operator
+        devspaces-rhel9-operator-container: devspaces/devspaces-rhel9-operator
 
         # 00_java11-maven-microprofile-xp3/devfile.yaml
         # 00_java11-maven-eap/devfile.yaml
@@ -40,15 +40,15 @@ operator_manifests:
         ubi8-micro-container: registry.redhat.io/ubi8/ubi-micro
         kube-rbac-proxy-container: openshift4/ose-kube-rbac-proxy
         golang-github-openshift-oauth-proxy-container: openshift4/ose-oauth-proxy
-        devspaces-configbump-rhel8-container: devspaces/configbump-rhel8
-        devspaces-dashboard-rhel8-container: devspaces/dashboard-rhel8
+        devspaces-configbump-rhel9-container: devspaces/configbump-rhel9
+        devspaces-dashboard-rhel9-container: devspaces/dashboard-rhel9
         devspaces-idea-rhel8-container: devspaces/idea-rhel8
-        devspaces-imagepuller-rhel8-container: devspaces/imagepuller-rhel8
-        devspaces-machineexec-rhel8-container: devspaces/machineexec-rhel8
-        devspaces-pluginregistry-rhel8-container: devspaces/pluginregistry-rhel8
-        devspaces-server-rhel8-container: devspaces/server-rhel8
-        devspaces-traefik-rhel8-container: devspaces/traefik-rhel8
-        devspaces-udi-rhel8-container: devspaces/udi-rhel8
+        devspaces-imagepuller-rhel9-container: devspaces/imagepuller-rhel9
+        devspaces-machineexec-rhel9-container: devspaces/machineexec-rhel9
+        devspaces-pluginregistry-rhel9-container: devspaces/pluginregistry-rhel9
+        devspaces-server-rhel9-container: devspaces/server-rhel9
+        devspaces-traefik-rhel9-container: devspaces/traefik-rhel9
+        devspaces-udi-rhel9-container: devspaces/udi-rhel9
         # DWO
         devworkspace-operator-bundle-container: devworkspace/devworkspace-operator-bundle
         devworkspace-operator-bundle-package: devworkspace/devworkspace-operator-bundle

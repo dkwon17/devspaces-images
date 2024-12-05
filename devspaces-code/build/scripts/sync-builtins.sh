@@ -42,7 +42,7 @@ REMOTE_USER_AND_HOST="devspaces-build@spmm-util.engineering.redhat.com"
 BASE_URL="https://download.devel.redhat.com/rcm-guest/staging/devspaces/build-requirements"
 
 SCRIPTS_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
-if [[ $SCRIPTS_BRANCH != "devspaces-3."*"-rhel-8" ]]; then SCRIPTS_BRANCH="devspaces-3-rhel-8"; fi
+if [[ $SCRIPTS_BRANCH != "devspaces-3."*"-rhel-9" ]]; then SCRIPTS_BRANCH="devspaces-3-rhel-9"; fi
 
 replaceField()
 {

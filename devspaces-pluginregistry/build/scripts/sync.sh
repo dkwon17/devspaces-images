@@ -11,7 +11,7 @@
 #   Red Hat, Inc. - initial API and implementation
 #
 # SPECIAL CASE: convert registry upper-midstream (devspaces repo, forked from upstream w/ different plugins) to lower-midstream (devspaces-images repo) using yq, sed
-# https://github.com/redhat-developer/devspaces/tree/devspaces-3-rhel-8/dependencies to https://github.com/redhat-developer/devspaces-images
+# https://github.com/redhat-developer/devspaces/tree/devspaces-3-rhel-9/dependencies to https://github.com/redhat-developer/devspaces-images
 
 set -e
 
@@ -25,7 +25,7 @@ MIDSTM_NAME="pluginregistry"
 usage () {
     echo "
 Usage:   $0 -v [DS CSV_VERSION] [-s /path/to/sources] [-t /path/to/generated] [-b DS_BRANCH]
-Example: $0 -v 3.y.0 -s ${HOME}/devspaces -t /tmp/devspaces-images/devspaces-${MIDSTM_NAME} -b devspaces-3.y-rhel-8
+Example: $0 -v 3.y.0 -s ${HOME}/devspaces -t /tmp/devspaces-images/devspaces-${MIDSTM_NAME} -b devspaces-3.y-rhel-9
 "
     exit
 }
@@ -53,8 +53,8 @@ if [ "${CSV_VERSION}" == "3.y.0" ]; then usage; fi
 # https://github.com/redhat-developer/devspaces-images/blob/${DS_BRANCH}/devspaces-operator-bundle-generated/manifests/devspaces.csv.yaml
 if [[ -z ${DS_BRANCH} ]]; then 
   DS_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
-  if [[ $DS_BRANCH != "devspaces-3."*"-rhel-8" ]]; then
-    DS_BRANCH="devspaces-3-rhel-8"
+  if [[ $DS_BRANCH != "devspaces-3."*"-rhel-9" ]]; then
+    DS_BRANCH="devspaces-3-rhel-9"
   fi
 fi
 
@@ -122,7 +122,7 @@ cat << EOT >> "${TARGETDIR}/Dockerfile"
 ENV SUMMARY="Red Hat OpenShift Dev Spaces ${MIDSTM_NAME} container" \\
     DESCRIPTION="Red Hat OpenShift Dev Spaces ${MIDSTM_NAME} container" \\
     PRODNAME="devspaces" \\
-    COMPNAME="${MIDSTM_NAME}-rhel8"
+    COMPNAME="${MIDSTM_NAME}-rhel9"
 LABEL summary="\$SUMMARY" \\
       description="\$DESCRIPTION" \\
       io.k8s.description="\$DESCRIPTION" \\

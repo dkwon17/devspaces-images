@@ -8,7 +8,7 @@ import groovy.transform.Field
     // DRY_RUN
     // DEBUG
 
-def MIDSTM_BRANCH = 'devspaces-3-rhel-8'
+def MIDSTM_BRANCH = 'devspaces-3-rhel-9'
 def errorOccurred = false
 def String nodeLabel = 'x86_64-rhel8'  // ppc64le-rhel8 disabled with cffi error; s390x-rhel8-perm disabled as rust compilation sometimes fails
 timeout(120) {

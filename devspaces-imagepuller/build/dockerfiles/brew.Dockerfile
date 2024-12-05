@@ -57,7 +57,7 @@ CMD ["/kubernetes-image-puller"]
 ENV SUMMARY="Red Hat OpenShift Dev Spaces imagepuller container" \
     DESCRIPTION="Red Hat OpenShift Dev Spaces imagepuller container" \
     PRODNAME="devspaces" \
-    COMPNAME="imagepuller-rhel8"
+    COMPNAME="imagepuller-rhel9"
 LABEL summary="$SUMMARY" \
       description="$DESCRIPTION" \
       io.k8s.description="$DESCRIPTION" \

@@ -42,7 +42,7 @@ ENTRYPOINT ["/go/bin/che-machine-exec"]
 ENV SUMMARY="Red Hat OpenShift Dev Spaces machineexec container" \
     DESCRIPTION="Red Hat OpenShift Dev Spaces machineexec container" \
     PRODNAME="devspaces" \
-    COMPNAME="machineexec-rhel8"
+    COMPNAME="machineexec-rhel9"
 LABEL summary="$SUMMARY" \
       description="$DESCRIPTION" \
       io.k8s.description="$DESCRIPTION" \

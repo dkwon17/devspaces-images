@@ -51,7 +51,7 @@ ENTRYPOINT [ "/usr/local/bin/configbump" ]
 ENV SUMMARY="Red Hat OpenShift Dev Spaces configbump container" \
     DESCRIPTION="Red Hat OpenShift Dev Spaces configbump container" \
     PRODNAME="devspaces" \
-    COMPNAME="configbump-rhel8"
+    COMPNAME="configbump-rhel9"
 LABEL summary="$SUMMARY" \
       description="$DESCRIPTION" \
       io.k8s.description="$DESCRIPTION" \

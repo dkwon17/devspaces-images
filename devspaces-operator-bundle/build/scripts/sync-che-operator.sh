@@ -54,17 +54,17 @@ if [[ "${CSV_VERSION}" == "2.y.0" ]]; then usage; fi
 
 # see both sync-che-o*.sh scripts - need these since we're syncing to different midstream/dowstream repos
 DS_RRIO="registry.redhat.io/devspaces"
-DS_OPERATOR="devspaces-rhel8-operator"
-DS_CONFIGBUMP_IMAGE="${DS_RRIO}/configbump-rhel8:${DS_VERSION}"
-DS_DASHBOARD_IMAGE="${DS_RRIO}/dashboard-rhel8:${DS_VERSION}"
-DS_PLUGINREGISTRY_IMAGE="${DS_RRIO}/pluginregistry-rhel8:${DS_VERSION}"
-DS_SERVER_IMAGE="${DS_RRIO}/server-rhel8:${DS_VERSION}"
-DS_TRAEFIK_IMAGE="${DS_RRIO}/traefik-rhel8:${DS_VERSION}"
+DS_OPERATOR="devspaces-rhel9-operator"
+DS_CONFIGBUMP_IMAGE="${DS_RRIO}/configbump-rhel9:${DS_VERSION}"
+DS_DASHBOARD_IMAGE="${DS_RRIO}/dashboard-rhel9:${DS_VERSION}"
+DS_PLUGINREGISTRY_IMAGE="${DS_RRIO}/pluginregistry-rhel9:${DS_VERSION}"
+DS_SERVER_IMAGE="${DS_RRIO}/server-rhel9:${DS_VERSION}"
+DS_TRAEFIK_IMAGE="${DS_RRIO}/traefik-rhel9:${DS_VERSION}"
 
 UBI_IMAGE="registry.redhat.io/ubi8/ubi-minimal:${UBI_TAG}"
-UDI_VERSION_ZZZ=$(skopeo inspect docker://quay.io/devspaces/udi-rhel8:${DS_VERSION} | yq -r '.RepoTags' | sort -uV | grep "${DS_VERSION}-" | grep -E -v "\.[0-9]{10}" | tr -d '", ' | tail -1) # get 3.5-16, not 3.5-16.1678881134
-UDI_IMAGE_TAG=$(skopeo inspect docker://quay.io/devspaces/udi-rhel8:${UDI_VERSION_ZZZ} | yq -r '.Digest')
-UDI_IMAGE="registry.redhat.io/devspaces/udi-rhel8@${UDI_IMAGE_TAG}"
+UDI_VERSION_ZZZ=$(skopeo inspect docker://quay.io/devspaces/udi-rhel9:${DS_VERSION} | yq -r '.RepoTags' | sort -uV | grep "${DS_VERSION}-" | grep -E -v "\.[0-9]{10}" | tr -d '", ' | tail -1) # get 3.5-16, not 3.5-16.1678881134
+UDI_IMAGE_TAG=$(skopeo inspect docker://quay.io/devspaces/udi-rhel9:${UDI_VERSION_ZZZ} | yq -r '.Digest')
+UDI_IMAGE="registry.redhat.io/devspaces/udi-rhel9@${UDI_IMAGE_TAG}"
 RBAC_PROXY_IMAGE="registry.redhat.io/openshift4/ose-kube-rbac-proxy:${PROXY_TAG}"
 OAUTH_PROXY_IMAGE="registry.redhat.io/openshift4/ose-oauth-proxy:${PROXY_TAG}"
 
@@ -110,7 +110,7 @@ while IFS= read -r -d '' d; do
 	sed -r \
 		`# hardcoded test values` \
 		-e 's|"docker.io/eclipse/che-operator:latest": * "che-operator:latest"|"'${DS_RRIO}/${DS_OPERATOR}':latest":  "'${DS_OPERATOR}':latest"|' \
-		-e 's|"eclipse/che-operator:[0-9.]+": *"che-operator:[0-9.]+"|"'${DS_RRIO}'/server-operator-rhel8:2.0": "server-operator-rhel8:2.0"|' \
+		-e 's|"eclipse/che-operator:[0-9.]+": *"che-operator:[0-9.]+"|"'${DS_RRIO}'/server-operator-rhel9:2.0": "server-operator-rhel9:2.0"|' \
 		-e 's|"che-operator:[0-9.]+": *"che-operator:[0-9.]+"|"'${DS_RRIO}/${DS_OPERATOR}:${DS_VERSION}'":  "'${DS_OPERATOR}:${DS_VERSION}'"|' \
 	"$d" > "${TARGETDIR}/${d}"
 	if [[ $(diff -u "$d" "${TARGETDIR}/${d}") ]]; then
@@ -234,7 +234,7 @@ for updateName in "${!operator_replacements[@]}"; do
 done
 echo "Converted (yq #1) ${OPERATOR_DEPLOYMENT_YAML}"
 
-# CRW-1579 set correct devspaces-rhel8-operator image and tag in operator deployment yaml
+# CRW-1579 set correct devspaces-rhel9-operator image and tag in operator deployment yaml
 oldImage=$(yq -r '.spec.template.spec.containers[0].image' "${TARGETDIR}/${OPERATOR_DEPLOYMENT_YAML}")
 if [[ $oldImage ]]; then
 	replaceField "${TARGETDIR}/${OPERATOR_DEPLOYMENT_YAML}" ".spec.template.spec.containers[0].image" "${oldImage%%:*}:${DS_VERSION}" "${COPYRIGHT}"
