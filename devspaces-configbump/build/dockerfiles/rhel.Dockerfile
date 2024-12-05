@@ -11,8 +11,8 @@
 # This container build creates configbump binary in a container
 # see also brew.Dockerfile
 
-# https://registry.access.redhat.com/rhel9-2-els/rhel
-FROM registry.redhat.io/rhel9-2-els/rhel:9.2-1405 as builder
+# https://registry.access.redhat.com/ubi9/go-toolset
+FROM registry.redhat.io/ubi9/go-toolset:1.22.7-1733160835 as builder
 USER 0
 ENV GOPATH=/go/ \
     CGO_ENABLED=1
@@ -21,8 +21,7 @@ WORKDIR /app
 COPY . ./
 
 #hadolint ignore=SC3010
-RUN dnf -y install golang && \
-    export ARCH="$(uname -m)" && if [[ ${ARCH} == "x86_64" ]]; then export ARCH="amd64"; elif [[ ${ARCH} == "aarch64" ]]; then export ARCH="arm64"; fi && \
+RUN export ARCH="$(uname -m)" && if [[ ${ARCH} == "x86_64" ]]; then export ARCH="amd64"; elif [[ ${ARCH} == "aarch64" ]]; then export ARCH="arm64"; fi && \
     go mod download && go mod verify && \
     go test -v  ./... && \
     # to test FIPS compliance, run https://github.com/openshift/check-payload#scan-a-container-or-operator-image against a built image
@@ -30,14 +29,14 @@ RUN dnf -y install golang && \
     cp configbump /usr/local/bin/configbump && \
     chmod 755 /usr/local/bin/configbump
 
-# https://registry.access.redhat.com/rhel9-2-els/rhel
-FROM registry.redhat.io/rhel9-2-els/rhel:9.2-1405 as runtime
+# https://registry.access.redhat.com/ubi9-minimal
+FROM registry.redhat.io/ubi9-minimal:9.5-1731593028 as runtime
 #hadolint ignore=DL4006
-RUN dnf -y install shadow-utils && \
+RUN microdnf -y install shadow-utils && \
     adduser appuser && \
-    dnf -y remove shadow-utils && \
-    dnf -y update || true && \
-    dnf -y clean all && rm -rf /var/cache/yum && \
+    microdnf -y remove shadow-utils && \
+    microdnf -y update || true && \
+    microdnf -y clean all && rm -rf /var/cache/yum && \
     echo "Installed Packages" && rpm -qa | sort -V && echo "End Of Installed Packages"
 
 USER appuser
