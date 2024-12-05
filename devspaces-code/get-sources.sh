@@ -22,10 +22,10 @@ while [[ "$#" -gt 0 ]]; do
 	shift 1
 done
 
-# if building a scratch from a private branch, use --target devspaces-*-rhel-8-containers-candidate
+# if building a scratch from a private branch, use --target devspaces-*-rhel-9-containers-candidate
 MIDSTM_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
 if [[ ${MIDSTM_BRANCH} = "private-"* ]] || [[ ${MIDSTM_BRANCH} != "devspaces-"*"-rhel-"* ]]; then
-	if [[ ! $targetFlag ]]; then targetFlag="--target devspaces-3-rhel-8-containers-candidate"; fi
+	if [[ ! $targetFlag ]]; then targetFlag="--target devspaces-3-rhel-9-containers-candidate"; fi
 	if [[ ! $scratchFlag ]]; then scratchFlag="--scratch"; fi
 fi
 

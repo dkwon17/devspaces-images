@@ -4,4 +4,4 @@ This repo contains the necessary metadata for the DevWorkspace enabled, all-name
 
 For the golang application that is the DevSpaces Operator, see 
 
-https://github.com/redhat-developer/devspaces-images/tree/devspaces-3-rhel-8/devspaces-operator
+https://github.com/redhat-developer/devspaces-images/tree/devspaces-3-rhel-9/devspaces-operator

@@ -2,8 +2,8 @@ pipelineJob("${FOLDER_PATH}/${ITEM_NAME}"){
     disabled(false)
     description('''<p>Generate daily lint reports of <a href=https://issues.redhat.com/browse/CRW>CRW jira</a> hygiene</p>
 <ul>
-<li>a <a href=https://github.com/redhat-developer/devspaces-jiralint/blob/devspaces-3-rhel-8/reports-weekly.json>weekly report</a> Sundays @ 22h00 and </li>
-<li><a href=https://github.com/redhat-developer/devspaces-jiralint/blob/devspaces-3-rhel-8/reports-daily.json>daily reports</a> Monday to Thursday @ 22h00</li>
+<li>a <a href=https://github.com/redhat-developer/devspaces-jiralint/blob/devspaces-3-rhel-9/reports-weekly.json>weekly report</a> Sundays @ 22h00 and </li>
+<li><a href=https://github.com/redhat-developer/devspaces-jiralint/blob/devspaces-3-rhel-9/reports-daily.json>daily reports</a> Monday to Thursday @ 22h00</li>
 </ul><br/>
 To override the normal report type to today, choose a different type. <br/>
 Use <b>dry run</b> flag and your own email address to control output before sending emails to component owners.''')

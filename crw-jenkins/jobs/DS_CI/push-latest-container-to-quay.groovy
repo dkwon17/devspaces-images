@@ -1,6 +1,6 @@
 import groovy.json.JsonSlurper
 
-def curlCMD = "https://raw.githubusercontent.com/redhat-developer/devspaces/devspaces-3-rhel-8/dependencies/job-config.json".toURL().text
+def curlCMD = "https://raw.githubusercontent.com/redhat-developer/devspaces/devspaces-3-rhel-9/dependencies/job-config.json".toURL().text
 
 def jsonSlurper = new JsonSlurper();
 def config = jsonSlurper.parseText(curlCMD);
@@ -19,7 +19,7 @@ for (JB in JOB_BRANCHES) {
     }
     if (FILE_CHECK) {
         JOB_BRANCH=""+JB
-        MIDSTM_BRANCH="devspaces-" + JOB_BRANCH.replaceAll(".x","") + "-rhel-8"
+        MIDSTM_BRANCH="devspaces-" + JOB_BRANCH.replaceAll(".x","") + "-rhel-9"
         FLOATING_QUAY_TAGS="" + config.Other."FLOATING_QUAY_TAGS"[JB]
         OCP_VERSIONS="" + config.Other."OPENSHIFT_VERSIONS_SUPPORTED"[JB]?.join(" ")
         jobPath="${FOLDER_PATH}/${ITEM_NAME}_" + JOB_BRANCH
@@ -58,7 +58,7 @@ Triggered by  <a href=../get-sources-rhpkg-container-build_''' + JOB_BRANCH + ''
 </ul>
 
 <p>NOTE:  If no nodes are available, run: <br/>
-    <b><a href=https://github.com/redhat-developer/devspaces/blob/devspaces-3-rhel-8/product/getLatestImageTags.sh>getLatestImageTags.sh</a> 
+    <b><a href=https://github.com/redhat-developer/devspaces/blob/devspaces-3-rhel-9/product/getLatestImageTags.sh>getLatestImageTags.sh</a> 
     -c "codeready-workspaces-udi-rhel8 codeready-workspaces-dashboard-rhel8" -b ''' + MIDSTM_BRANCH + ''' --osbs --pushtoquay="''' + 
     (JOB_BRANCH.equals("3.x") ? config.Version + ''' next''' : JOB_BRANCH+''' latest''') + 
     '''"</b>

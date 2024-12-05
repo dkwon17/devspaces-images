@@ -82,22 +82,22 @@ if [[ "${CSV_VERSION_PREV}" == "3.x.0" ]]; then usage; fi
 
 # see both sync-che-o*.sh scripts - need these since we're syncing to different midstream/dowstream repos
 DS_RRIO="registry.redhat.io/devspaces"
-DS_OPERATOR="devspaces-rhel8-operator"
-DS_CONFIGBUMP_IMAGE="${DS_RRIO}/configbump-rhel8:${DS_VERSION}"
-DS_DASHBOARD_IMAGE="${DS_RRIO}/dashboard-rhel8:${DS_VERSION}"
-DS_PLUGINREGISTRY_IMAGE="${DS_RRIO}/pluginregistry-rhel8:${DS_VERSION}"
-DS_SERVER_IMAGE="${DS_RRIO}/server-rhel8:${DS_VERSION}"
-DS_TRAEFIK_IMAGE="${DS_RRIO}/traefik-rhel8:${DS_VERSION}"
+DS_OPERATOR="devspaces-rhel9-operator"
+DS_CONFIGBUMP_IMAGE="${DS_RRIO}/configbump-rhel9:${DS_VERSION}"
+DS_DASHBOARD_IMAGE="${DS_RRIO}/dashboard-rhel9:${DS_VERSION}"
+DS_PLUGINREGISTRY_IMAGE="${DS_RRIO}/pluginregistry-rhel9:${DS_VERSION}"
+DS_SERVER_IMAGE="${DS_RRIO}/server-rhel9:${DS_VERSION}"
+DS_TRAEFIK_IMAGE="${DS_RRIO}/traefik-rhel9:${DS_VERSION}"
 
 UBI_IMAGE="registry.redhat.io/ubi8/ubi-minimal:${UBI_TAG}"
-UDI_VERSION_ZZZ=$(skopeo inspect docker://quay.io/devspaces/udi-rhel8:${DS_VERSION} | yq -r '.RepoTags' | sort -uV | grep "${DS_VERSION}-" | grep -E -v "\.[0-9]{10}" | tr -d '", ' | tail -1) # get 3.5-16, not 3.5-16.1678881134
-UDI_IMAGE_TAG=$(skopeo inspect docker://quay.io/devspaces/udi-rhel8:${UDI_VERSION_ZZZ} | yq -r '.Digest')
-UDI_IMAGE="registry.redhat.io/devspaces/udi-rhel8@${UDI_IMAGE_TAG}"
+UDI_VERSION_ZZZ=$(skopeo inspect docker://quay.io/devspaces/udi-rhel9:${DS_VERSION} | yq -r '.RepoTags' | sort -uV | grep "${DS_VERSION}-" | grep -E -v "\.[0-9]{10}" | tr -d '", ' | tail -1) # get 3.5-16, not 3.5-16.1678881134
+UDI_IMAGE_TAG=$(skopeo inspect docker://quay.io/devspaces/udi-rhel9:${UDI_VERSION_ZZZ} | yq -r '.Digest')
+UDI_IMAGE="registry.redhat.io/devspaces/udi-rhel9@${UDI_IMAGE_TAG}"
 RBAC_PROXY_IMAGE="registry.redhat.io/openshift4/ose-kube-rbac-proxy:${PROXY_TAG}"
 OAUTH_PROXY_IMAGE="registry.redhat.io/openshift4/ose-oauth-proxy:${PROXY_TAG}"
 
-UDI_IMAGE_WITH_TAG="${DS_RRIO}/udi-rhel8:${DS_VERSION}"
-CODE_IMAGE_WITH_TAG="${DS_RRIO}/code-rhel8:${DS_VERSION}"
+UDI_IMAGE_WITH_TAG="${DS_RRIO}/udi-rhel9:${DS_VERSION}"
+CODE_IMAGE_WITH_TAG="${DS_RRIO}/code-rhel9:${DS_VERSION}"
 IDEA_IMAGE_WITH_TAG="${DS_RRIO}/idea-rhel8:${DS_VERSION}"
 
 # header to reattach to yaml files after yq transform removes it
@@ -205,8 +205,8 @@ for CSVFILE in ${TARGETDIR}/manifests/devspaces.csv.yaml; do
 		\
 		-e "s|quay.io/eclipse/devspaces-operator:.+|registry.redhat.io/devspaces/${DS_OPERATOR}:${DS_VERSION}|" \
 		-e "s|(registry.redhat.io/devspaces/${DS_OPERATOR}:${DS_VERSION}).+|\1|" \
-		-e "s|quay.io/eclipse/che-server:.+|registry.redhat.io/devspaces/server-rhel8:${DS_VERSION}|" \
-		-e "s|quay.io/eclipse/che-plugin-registry:.+|registry.redhat.io/devspaces/pluginregistry-rhel8:${DS_VERSION}|" \
+		-e "s|quay.io/eclipse/che-server:.+|registry.redhat.io/devspaces/server-rhel9:${DS_VERSION}|" \
+		-e "s|quay.io/eclipse/che-plugin-registry:.+|registry.redhat.io/devspaces/pluginregistry-rhel9:${DS_VERSION}|" \
 		\
 		`# CRW-1254 use ubi8/ubi-minimal for airgap mirroring` \
 		-e "s|/ubi8-minimal|/ubi8/ubi-minimal|g" \

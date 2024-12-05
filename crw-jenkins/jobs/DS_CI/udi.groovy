@@ -1,5 +1,5 @@
 import groovy.json.JsonSlurper
-def curlCMD = "https://raw.githubusercontent.com/redhat-developer/devspaces/devspaces-3-rhel-8/dependencies/job-config.json".toURL().text
+def curlCMD = "https://raw.githubusercontent.com/redhat-developer/devspaces/devspaces-3-rhel-9/dependencies/job-config.json".toURL().text
 
 def jsonSlurper = new JsonSlurper();
 def config = jsonSlurper.parseText(curlCMD);
@@ -18,7 +18,7 @@ for (JB in JOB_BRANCHES) {
     }
     if (FILE_CHECK) {
         JOB_BRANCH=""+JB
-        MIDSTM_BRANCH="devspaces-" + JOB_BRANCH.replaceAll(".x","") + "-rhel-8"
+        MIDSTM_BRANCH="devspaces-" + JOB_BRANCH.replaceAll(".x","") + "-rhel-9"
         jobPath="${FOLDER_PATH}/${ITEM_NAME}_" + JOB_BRANCH
         pipelineJob(jobPath){
             disabled(config.Jobs.udi[JB].disabled) // on reload of job, disable to avoid churn
@@ -33,8 +33,8 @@ for (JB in JOB_BRANCHES) {
             def CMD="git ls-remote --heads https://github.com/" + SOURCE_REPO + ".git " + SOURCE_BRANCH
             def BRANCH_CHECK=CMD.execute().text
             if (!BRANCH_CHECK) {
-                //pluginregistry uses devspaces-3.yy-rhel-8 so if branch doesn't exist use devspaces-3-rhel-8
-                SOURCE_BRANCH="devspaces-3-rhel-8"
+                //pluginregistry uses devspaces-3.yy-rhel-9 so if branch doesn't exist use devspaces-3-rhel-9
+                SOURCE_BRANCH="devspaces-3-rhel-9"
             }
 
             description('''

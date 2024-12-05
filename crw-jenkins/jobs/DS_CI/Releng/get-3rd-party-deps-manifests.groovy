@@ -1,6 +1,6 @@
 import groovy.json.JsonSlurper
 
-def curlCMD = "https://raw.githubusercontent.com/redhat-developer/devspaces/devspaces-3-rhel-8/dependencies/job-config.json".toURL().text
+def curlCMD = "https://raw.githubusercontent.com/redhat-developer/devspaces/devspaces-3-rhel-9/dependencies/job-config.json".toURL().text
 
 def jsonSlurper = new JsonSlurper();
 def config = jsonSlurper.parseText(curlCMD);
@@ -23,11 +23,11 @@ for (String JOB_BRANCH : JOB_BRANCHES) {
         // keep job disabled until we explicitly need it
         disabled(true)
 
-        MIDSTM_BRANCH="devspaces-" + JOB_BRANCH.replaceAll(".x","") + "-rhel-8"
+        MIDSTM_BRANCH="devspaces-" + JOB_BRANCH.replaceAll(".x","") + "-rhel-9"
 
         description('''
-Collect product security manifests container builds, and push to <a href=https://github.com/redhat-developer/devspaces/tree/devspaces-3-rhel-8/product/manifest/>
-https://github.com/redhat-developer/devspaces/tree/devspaces-3-rhel-8/product/manifest/</a>
+Collect product security manifests container builds, and push to <a href=https://github.com/redhat-developer/devspaces/tree/devspaces-3-rhel-9/product/manifest/>
+https://github.com/redhat-developer/devspaces/tree/devspaces-3-rhel-9/product/manifest/</a>
 
 as part of a GA release. 
 
