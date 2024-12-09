@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2023 Red Hat, Inc.
+# Copyright (c) 2019-2024 Red Hat, Inc.
 # This program and the accompanying materials are made
 # available under the terms of the Eclipse Public License 2.0
 # which is available at https://www.eclipse.org/legal/epl-2.0/
@@ -9,8 +9,8 @@
 #   Red Hat, Inc. - initial API and implementation
 #
 
-# https://registry.access.redhat.com/rhel9-2-els/rhel
-FROM registry.redhat.io/rhel9-2-els/rhel:9.2-1405 as builder
+# https://registry.access.redhat.com/ubi9/go-toolset
+FROM registry.redhat.io/ubi9/go-toolset:1.22.7-1733160835 as builder
 ENV GOPATH=/go/ \
     CGO_ENABLED=1
 ARG SKIP_TESTS="false"
@@ -20,8 +20,6 @@ USER root
 COPY $REMOTE_SOURCES $REMOTE_SOURCES_DIR
 RUN source $REMOTE_SOURCES_DIR/devspaces-images-operator/cachito.env
 WORKDIR $REMOTE_SOURCES_DIR/devspaces-images-operator/app/devspaces-operator
-
-RUN dnf -y install golang
 
 RUN mkdir -p /tmp/devworkspace-operator/templates/ && \
     mv $REMOTE_SOURCES_DIR/DEV_WORKSPACE_CONTROLLER/app/deploy/deployment/* /tmp/devworkspace-operator/templates/
@@ -49,11 +47,11 @@ RUN export ARCH="$(uname -m)" && if [[ ${ARCH} == "x86_64" ]]; then export ARCH=
     if [[ ${SKIP_TESTS} == "false" ]]; then export MOCK_API=true && go test -mod=vendor -v ./...; fi && \
     GOOS=linux GOARCH=${ARCH} GO111MODULE=on go build -mod=vendor -a -o che-operator main.go
 
-# https://registry.access.redhat.com/rhel9-2-els/rhel
-FROM registry.redhat.io/rhel9-2-els/rhel:9.2-1405
+# https://registry.access.redhat.com/ubi9-minimal
+FROM registry.redhat.io/ubi9-minimal:9.5-1731593028
 
-RUN dnf update -y && \
-    dnf -y clean all && rm -rf /var/cache/yum && echo "Installed Packages" && rpm -qa | sort -V && echo "End Of Installed Packages"
+RUN microdnf update -y && \
+    microdnf -y clean all && rm -rf /var/cache/yum && echo "Installed Packages" && rpm -qa | sort -V && echo "End Of Installed Packages"
 
 COPY --from=builder /tmp/devworkspace-operator/templates /tmp/devworkspace-operator/templates
 COPY --from=builder /tmp/header-rewrite-traefik-plugin /tmp/header-rewrite-traefik-plugin
