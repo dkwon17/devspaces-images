@@ -69,6 +69,7 @@ remote_sources:
         - path: devspaces-code/code/extensions/typescript-language-features
         - path: devspaces-code/code/extensions/vscode-api-tests
         - path: devspaces-code/code/extensions/vscode-colorize-tests
+        - path: devspaces-code/code/extensions/vscode-colorize-perf-tests
         - path: devspaces-code/code/extensions/vscode-test-resolver
         - path: devspaces-code/code/remote
         - path: devspaces-code/code/remote/web

@@ -182,6 +182,7 @@ RUN cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/ && npm
     && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/typescript-language-features && npm install \
     && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/vscode-api-tests && npm install \
     && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/vscode-colorize-tests && npm install \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/vscode-colorize-perf-tests && npm install \
     && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/vscode-test-resolver && npm install \
     && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/remote && npm install \
     && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/remote/web && npm install \
@@ -389,6 +390,7 @@ RUN cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/ && npm
     && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/typescript-language-features && npm install \
     && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/vscode-api-tests && npm install \
     && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/vscode-colorize-tests && npm install \
+    && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/vscode-colorize-perf-tests && npm install \
     && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/extensions/vscode-test-resolver && npm install \
     && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/remote && npm install \
     && cd $REMOTE_SOURCES_DIR/devspaces-images-code/app/devspaces-code/code/remote/web && npm install \
