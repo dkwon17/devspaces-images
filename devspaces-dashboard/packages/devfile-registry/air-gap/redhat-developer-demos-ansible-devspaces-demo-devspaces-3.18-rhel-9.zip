@@ -1,0 +1,5 @@
+{
+  "message": "`redhat-developer-demos` forbids access via a personal access token (classic). Please use a GitHub App, OAuth App, or a personal access token with fine-grained permissions.",
+  "documentation_url": "https://docs.github.com/rest/repos/contents#download-a-repository-archive-zip",
+  "status": "403"
+}

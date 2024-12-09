@@ -1,9 +1,0 @@
-message: "`redhat-developer-demos` forbids access via a personal access token (classic).\
-  \ Please use a GitHub App, OAuth App, or a personal access token with fine-grained\
-  \ permissions."
-documentation_url: "https://docs.github.com/rest/repos/contents#get-repository-content"
-status: "403"
-projects:
-  - name: ansible-devspaces-demo
-    zip:
-      location: CHE_DASHBOARD_INTERNAL_URL/dashboard/api/airgap-sample/project/download?id=ansible
