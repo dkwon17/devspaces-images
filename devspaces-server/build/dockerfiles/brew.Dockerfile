@@ -9,14 +9,14 @@
 #   Red Hat, Inc. - initial API and implementation
 #
 
-# https://access.redhat.com/rhel9-2-els/rhel
-FROM registry.redhat.io/rhel9-2-els/rhel:9.2-1222
+# https://access.redhat.com/ubi9-minimal
+FROM registry.redhat.io/ubi9-minimal:9.5-1731593028
 USER root
 ENV CHE_HOME=/home/user/devspaces
 ENV JAVA_HOME=/usr/lib/jvm/jre
-RUN dnf -y install java-17-openjdk-headless tar gzip shadow-utils findutils && \
-    dnf update -y && \
-    dnf -y clean all && rm -rf /var/cache/yum && echo "Installed Packages" && rpm -qa | sort -V && echo "End Of Installed Packages" && \
+RUN microdnf -y install java-17-openjdk-headless tar gzip shadow-utils findutils && \
+    microdnf update -y && \
+    microdnf -y clean all && rm -rf /var/cache/yum && echo "Installed Packages" && rpm -qa | sort -V && echo "End Of Installed Packages" && \
     adduser -G root user && mkdir -p /home/user/devspaces
 COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
