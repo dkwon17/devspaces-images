@@ -152,8 +152,6 @@ addRipGrepLibrary() {
 }
 
 addRipGrepToYaml() {
-  # Make sure node environment is set up
-  source ~/node_env $DS_VERSION
   #fetch post-install script for vscode ripgrep extension, in which we find the required version of ripgrep
   VSCODE_RIPGREP_VERSION=$(cd "$TARGETDIR"/code; grep '"node_modules/@vscode/ripgrep"' package-lock.json -A 2 | grep '"version"' | head -1 | cut -d '"' -f 4)
   # cache directory in brew.Dockerfile must be updated according to this version
