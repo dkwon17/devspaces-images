@@ -10,7 +10,7 @@
 #
 
 # https://registry.access.redhat.com/ubi9/go-toolset
-FROM registry.redhat.io/ubi9/go-toolset:1.22.7-1733160835 as builder
+FROM registry.redhat.io/ubi9/go-toolset:9.5-1733160835 as builder
 ENV GOPATH=/go/ \
     CGO_ENABLED=1
 USER root
@@ -27,7 +27,7 @@ RUN adduser unprivilegeduser && \
     cp -rf /che-machine-exec/che-machine-exec /rootfs/go/bin
 
 # https://registry.access.redhat.com/ubi9-minimal
-FROM registry.redhat.io/ubi9-minimal:9.5-1731593028 as runtime
+FROM registry.redhat.io/ubi9-minimal:9.5-1733767867 as runtime
 COPY --from=builder /rootfs /
 RUN microdnf install -y openssl && \
     microdnf -y update && \
