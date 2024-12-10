@@ -1,5 +1,5 @@
 # https://registry.access.redhat.com/ubi9-minimal 
-FROM registry.redhat.io/ubi9-minimal:9.5-1731593028 as builder
+FROM registry.redhat.io/ubi9-minimal:9.5-1733767867 as builder
 USER 0
 
 # cachito
@@ -19,7 +19,7 @@ RUN go generate && \
     go build ./cmd/traefik
 
 # https://registry.access.redhat.com/ubi9-minimal 
-FROM registry.redhat.io/ubi9-minimal:9.5-1731593028 
+FROM registry.redhat.io/ubi9-minimal:9.5-1733767867
 
 COPY --from=builder $REMOTE_SOURCES_DIR/devspaces-images-traefik/app/devspaces-traefik/script/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder $REMOTE_SOURCES_DIR/devspaces-images-traefik/app/devspaces-traefik/traefik /traefik
@@ -45,6 +45,6 @@ LABEL summary="$SUMMARY" \
       name="$PRODNAME/$COMPNAME" \
       version="3.18" \
       license="EPLv2" \
-      maintainer="Samantha Dawley <sdawley@redhat.com>, Nick Boldt <nboldt@redhat.com>" \
+      maintainer="Samantha Dawley <sdawley@redhat.com>" \
       io.openshift.expose-services="" \
       usage=""
