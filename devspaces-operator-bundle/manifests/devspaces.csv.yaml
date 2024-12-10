@@ -59,7 +59,7 @@ metadata:
     categories: Developer Tools
     certified: "true"
     containerImage: registry-proxy.engineering.redhat.com/rh-osbs/devspaces-operator:3.18
-    createdAt: "2024-12-09T19:15:22+00:00"
+    createdAt: "2024-12-10T12:01:41+00:00"
     description: Devfile v2 and v1 development solution, 1 instance per cluster, for
       portable, collaborative k8s workspaces.
     features.operators.openshift.io/cnf: "false"
@@ -933,8 +933,6 @@ spec:
                         value: registry-proxy.engineering.redhat.com/rh-osbs/devspaces-pluginregistry-rhel9:3.18
                       - name: RELATED_IMAGE_pvc_jobs
                         value: registry.redhat.io/ubi8/ubi-minimal:8.8
-                      - name: RELATED_IMAGE_sample_ansible_demo_tooling_container
-                        value: ghcr.io/ansible/ansible-devspaces@sha256:a28fa23d254ff1b3ae10b95a0812132148f141bda4516661e40d0c49c4ace200
                       - name: RELATED_IMAGE_sample_encoded_cmVnaXN0cnkucmVkaGF0LmlvL2RldnNwYWNlcy91ZGktcmhlbDg6My4xNwo____
                         value: registry.redhat.io/devspaces/udi-rhel8:3.17
                       - name: RELATED_IMAGE_sample_encoded_cmVnaXN0cnkucmVkaGF0LmlvL2RldnNwYWNlcy91ZGktcmhlbDk6My4xOAo____
