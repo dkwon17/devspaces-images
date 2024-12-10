@@ -419,8 +419,8 @@ for CSVFILE in ${TARGETDIR}/manifests/devspaces.csv.yaml; do
       CONTAINER_IMAGE=$(yq -r '.components['${CONTAINER_INDEX}'].container.image' /tmp/devfile.yaml)
 
       # CRW-3177, CRW-3178 sort uniquely; replace quay refs with RHEC refs
-      # remove ghcr.io/ansible/ansible-workspace-env-reference from RELATED_IMAGEs
-      if [[ ! ${CONTAINER_IMAGE} == *"ghcr.io/ansible/ansible-workspace-env-reference"* ]]; then
+      # remove ghcr.io/ansible/ansible-devspaces from RELATED_IMAGEs
+      if [[ ! ${CONTAINER_IMAGE} == *"ghcr.io/ansible"* ]]; then
         if [[ ${CONTAINER_IMAGE} == *"@"*  ]]; then
           # We don't need to encode the image name if it contains a digest
           SAMPLE_NAME=$(yq -r '.metadata.name' /tmp/devfile.yaml | sed 's|-|_|g')
