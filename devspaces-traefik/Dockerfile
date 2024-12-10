@@ -1,5 +1,5 @@
-# https://registry.access.redhat.com/ubi8-minimal 
-FROM registry.access.redhat.com/ubi8-minimal:8.10-1086 as builder
+# https://registry.access.redhat.com/ubi9-minimal 
+FROM registry.redhat.io/ubi9-minimal:9.5-1731593028 as builder
 USER 0
 
 # cachito
@@ -9,7 +9,7 @@ WORKDIR $REMOTE_SOURCES_DIR/devspaces-images-traefik/app/devspaces-traefik
 
 RUN microdnf -y install dnf && \
     dnf -y -q install golang-1.20.12
-
+    
 #GO BUILD
 RUN cp $REMOTE_SOURCES_DIR/devspaces-images-traefik/app/devspaces-traefik/script/ca-certificates.crt /etc/ssl/certs/
 
@@ -18,8 +18,8 @@ ENV CGO_ENABLED=1
 RUN go generate && \
     go build ./cmd/traefik
 
-# https://registry.access.redhat.com/ubi8-minimal 
-FROM registry.access.redhat.com/ubi8-minimal:8.10-1086 
+# https://registry.access.redhat.com/ubi9-minimal 
+FROM registry.redhat.io/ubi9-minimal:9.5-1731593028 
 
 COPY --from=builder $REMOTE_SOURCES_DIR/devspaces-images-traefik/app/devspaces-traefik/script/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder $REMOTE_SOURCES_DIR/devspaces-images-traefik/app/devspaces-traefik/traefik /traefik

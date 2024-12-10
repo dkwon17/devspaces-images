@@ -109,7 +109,7 @@ ENV SUMMARY="Red Hat OpenShift Dev Spaces ${MIDSTM_NAME} container" \\
     DESCRIPTION="Red Hat OpenShift Dev Spaces ${MIDSTM_NAME} container" \\
     TRAEFIK_VERSION="${TRAEFIK_VERSION}" \\
     PRODNAME="devspaces" \\
-    COMPNAME="${MIDSTM_NAME}-rhel8"
+    COMPNAME="${MIDSTM_NAME}-rhel9"
 LABEL summary="\$SUMMARY" \\
       description="\$DESCRIPTION" \\
       io.k8s.description="\$DESCRIPTION" \\
@@ -119,7 +119,7 @@ LABEL summary="\$SUMMARY" \\
       name="\$PRODNAME/\$COMPNAME" \\
       version="${DS_VERSION}" \\
       license="EPLv2" \\
-      maintainer="Samantha Dawley <sdawley@redhat.com>, Nick Boldt <nboldt@redhat.com>" \\
+      maintainer="Samantha Dawley <sdawley@redhat.com>" \\
       io.openshift.expose-services="" \\
       usage=""
 EOT
