@@ -41,7 +41,7 @@ USER user
 ENV SUMMARY="Red Hat OpenShift Dev Spaces server container" \
     DESCRIPTION="Red Hat OpenShift Dev Spaces server container" \
     PRODNAME="devspaces" \
-    COMPNAME="server-rhel8"
+    COMPNAME="server-rhel9"
 LABEL summary="$SUMMARY" \
       description="$DESCRIPTION" \
       io.k8s.description="$DESCRIPTION" \
