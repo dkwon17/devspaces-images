@@ -5,7 +5,7 @@ This document reflects the project's changes made after each release cycle
 
 ### News
 
-- Updated `machine-exec` image, the `next` version of the `devspaces/machineexec-rhel8` image is used ([#126](https://github.com/che-incubator/jetbrains-editor-images/pull/126))
+- Updated `machine-exec` image, the `next` version of the `devspaces/machineexec-rhel9` image is used ([#126](https://github.com/che-incubator/jetbrains-editor-images/pull/126))
 - Updated version of the Gradle IntelliJ Plugin to 1.3.1 ([#138](https://github.com/che-incubator/jetbrains-editor-images/pull/138))
 - Updated base ubi-minimal image to 8.6-994 ([#135](https://github.com/che-incubator/jetbrains-editor-images/pull/135))
 - Updated Projector Server sources to [c1cbeb2](https://github.com/JetBrains/projector-server/commit/c1cbeb258143c10a964557e7412c2911222036a9) ([#139](https://github.com/che-incubator/jetbrains-editor-images/pull/139))

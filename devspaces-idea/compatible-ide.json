@@ -1,7 +1,7 @@
 [
   {
     "displayName": "IntelliJ IDEA Community",
-    "dockerImage": "idea-rhel8",
+    "dockerImage": "idea-rhel9",
     "productCode": "IC",
     "productVersion": [
       {

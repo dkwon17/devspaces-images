@@ -85,8 +85,8 @@ sed_in_place() {
 }
 
 sed_in_place -r \
-  `# Update ubi8 image name` \
-  -e "s#ubi8/ubi:#ubi8:#g" \
+  `# Update ubi9 image name` \
+  -e "s#ubi9/ubi:#ubi9:#g" \
   `# Remove unused Python packages (support for PyCharm not included in CRW)` \
   -e "/python2 python39 \\\\/d" \
   "${TARGETDIR}"/Dockerfile
@@ -106,7 +106,7 @@ cat << EOT > "${TARGETDIR}"/compatible-ide.json
 [
   {
     "displayName": "IntelliJ IDEA Community",
-    "dockerImage": "idea-rhel8",
+    "dockerImage": "idea-rhel9",
     "productCode": "IC",
     "productVersion": [
       {

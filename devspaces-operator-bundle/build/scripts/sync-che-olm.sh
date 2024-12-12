@@ -98,7 +98,7 @@ OAUTH_PROXY_IMAGE="registry.redhat.io/openshift4/ose-oauth-proxy:${PROXY_TAG}"
 
 UDI_IMAGE_WITH_TAG="${DS_RRIO}/udi-rhel9:${DS_VERSION}"
 CODE_IMAGE_WITH_TAG="${DS_RRIO}/code-rhel9:${DS_VERSION}"
-IDEA_IMAGE_WITH_TAG="${DS_RRIO}/idea-rhel8:${DS_VERSION}"
+IDEA_IMAGE_WITH_TAG="${DS_RRIO}/idea-rhel9:${DS_VERSION}"
 
 # header to reattach to yaml files after yq transform removes it
 COPYRIGHT="#
@@ -358,8 +358,8 @@ for CSVFILE in ${TARGETDIR}/manifests/devspaces.csv.yaml; do
   # https://github.com/eclipse-che/che/issues/22932
   yq -riY "del(.spec.install.spec.deployments[].spec.template.spec.containers[0].env[] | select(.name | test(\"^RELATED_IMAGE_editor_definition_\")))" "${CSVFILE}"
   declare -A operator_insertion=(
-    ["RELATED_IMAGE_editor_definition_che_idea_latest_idea_rhel8"]="${UDI_IMAGE_WITH_TAG}"
-    ["RELATED_IMAGE_editor_definition_che_idea_latest_idea_rhel8_injector"]="${IDEA_IMAGE_WITH_TAG}"
+    ["RELATED_IMAGE_editor_definition_che_idea_latest_idea_rhel9"]="${UDI_IMAGE_WITH_TAG}"
+    ["RELATED_IMAGE_editor_definition_che_idea_latest_idea_rhel9_injector"]="${IDEA_IMAGE_WITH_TAG}"
     ["RELATED_IMAGE_editor_definition_che_code_latest_che_code_runtime_description"]="${UDI_IMAGE_WITH_TAG}"
     ["RELATED_IMAGE_editor_definition_che_code_latest_che_code_injector"]="${CODE_IMAGE_WITH_TAG}"
   )
@@ -378,8 +378,8 @@ for CSVFILE in ${TARGETDIR}/manifests/devspaces.csv.yaml; do
   CHE_IDEA_EDITOR_DEFINITION=$(curl -sL "https://raw.githubusercontent.com/redhat-developer/devspaces-images/${MIDSTM_BRANCH}/devspaces-operator/editors-definitions/che-idea.yaml")
   if [[ ! $(echo "${CHE_IDEA_EDITOR_DEFINITION}" | yq -r '.metadata.name')  == "che-idea" ]] || \
     [[ ! $(echo "${CHE_IDEA_EDITOR_DEFINITION}" | yq -r '.metadata.attributes.version')  == "latest" ]] || \
-    [[ $(echo "${CHE_IDEA_EDITOR_DEFINITION}" | yq -r '.components[] | select(.name=="idea-rhel8") | .container.image') == "" ]] || \
-    [[ $(echo "${CHE_IDEA_EDITOR_DEFINITION}" | yq -r '.components[] | select(.name=="idea-rhel8-injector") | .container.image') == "" ]]; then
+    [[ $(echo "${CHE_IDEA_EDITOR_DEFINITION}" | yq -r '.components[] | select(.name=="idea-rhel9") | .container.image') == "" ]] || \
+    [[ $(echo "${CHE_IDEA_EDITOR_DEFINITION}" | yq -r '.components[] | select(.name=="idea-rhel9-injector") | .container.image') == "" ]]; then
     echo "[ERROR] che-idea editor definition is invalid"; exit 1;
   fi
 

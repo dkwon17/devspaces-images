@@ -63,10 +63,10 @@ metadata:
 commands:
   - id: init-container-command
     apply:
-      component: idea-rhel8-injector
+      component: idea-rhel9-injector
   - id: init-che-idea-command
     exec:
-      component: idea-rhel8
+      component: idea-rhel9
       commandLine: nohup /projector/entrypoint-volume.sh > /projector/entrypoint-logs.txt
         2>&1 &
 events:
@@ -75,9 +75,9 @@ events:
   postStart:
     - init-che-idea-command
 components:
-  - name: idea-rhel8
+  - name: idea-rhel9
     container:
-      image: registry.redhat.io/ubi8/ubi-minimal:8.8
+      image: registry.redhat.io/ubi9/ubi-minimal:9.5
       env:
         - name: PROJECTOR_ASSEMBLY_DIR
           value: /projector
@@ -128,8 +128,8 @@ components:
             discoverable: false
             urlRewriteSupported: false
     attributes:
-      app.kubernetes.io/component: idea-rhel8-runtime
-      app.kubernetes.io/part-of: idea-rhel8.eclipse.org
+      app.kubernetes.io/component: idea-rhel9-runtime
+      app.kubernetes.io/part-of: idea-rhel9.eclipse.org
       controller.devfile.io/container-contribution: true
   - name: projector-volume
     volume: {}
@@ -137,9 +137,9 @@ components:
     volume: {}
   - name: projector-java-configuration
     volume: {}
-  - name: idea-rhel8-injector
+  - name: idea-rhel9-injector
     container:
-      image: registry.redhat.io/devspaces/idea-rhel8:3.18
+      image: registry.redhat.io/devspaces/idea-rhel9:3.18
       command:
         - /projector/entrypoint-init-container.sh
       env:

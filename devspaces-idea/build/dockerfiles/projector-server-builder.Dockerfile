@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Red Hat, Inc.
+# Copyright (c) 2024 Red Hat, Inc.
 # This program and the accompanying materials are made
 # available under the terms of the Eclipse Public License 2.0
 # which is available at https://www.eclipse.org/legal/epl-2.0/
@@ -6,8 +6,8 @@
 # SPDX-License-Identifier: EPL-2.0
 #
 
-# https://registry.access.redhat.com/ubi8/ubi
-FROM registry.access.redhat.com/ubi8/ubi:8.10-1132 as projector-builder
+# https://registry.access.redhat.com/ubi9/ubi
+FROM registry.redhat.io/ubi9/ubi:9.5-1732804088 as projector-builder
 
 RUN yum install java-11-openjdk unzip -y --nodocs
 RUN mkdir /projector && mkdir /projector-assembly
@@ -25,7 +25,7 @@ RUN ./gradlew :projector-server:distZip
 
 RUN find projector-server/build/distributions -type f -name "projector-server-*.zip" -exec mv {} "/projector-assembly/asset-projector-server-assembly.zip" \;
 
-# https://registry.access.redhat.com/ubi8/ubi-micro
-FROM registry.access.redhat.com/ubi8/ubi-micro:8.10-15
+# https://registry.access.redhat.com/ubi9/ubi-micro
+FROM registry.redhat.io/ubi9/ubi-micro:9.5-1733767087
 WORKDIR /projector
 COPY --from=projector-builder /projector-assembly/asset-projector-server-assembly.zip asset-projector-server-assembly.zip

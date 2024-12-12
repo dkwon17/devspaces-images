@@ -66,7 +66,7 @@ UDI_VERSION_ZZZ=$(skopeo inspect docker://quay.io/devspaces/udi-rhel9:${DS_VERSI
 UDI_IMAGE_TAG=$(skopeo inspect docker://quay.io/devspaces/udi-rhel9:${UDI_VERSION_ZZZ} | yq -r '.Digest')
 UDI_IMAGE="${DS_RRIO}/udi-rhel9@${UDI_IMAGE_TAG}"
 CODE_IMAGE="${DS_RRIO}/code-rhel9:${DS_VERSION}"
-IDEA_IMAGE="${DS_RRIO}/idea-rhel8:${DS_VERSION}"
+IDEA_IMAGE="${DS_RRIO}/idea-rhel9:${DS_VERSION}"
 RBAC_PROXY_IMAGE="registry.redhat.io/openshift4/ose-kube-rbac-proxy:${PROXY_TAG}"
 OAUTH_PROXY_IMAGE="registry.redhat.io/openshift4/ose-oauth-proxy:${PROXY_TAG}"
 
@@ -259,8 +259,8 @@ echo "Converted (yq #3) ${OPERATOR_DEPLOYMENT_YAML}"
 # The images are supposed to be replaced on ones with digest by operator
 yq -riY "(.components[] | select(.name==\"che-code-injector\") | .container.image)=\"${CODE_IMAGE}\"" "${TARGETDIR}/editors-definitions/che-code.yaml"
 yq -riY "(.components[] | select(.name==\"che-code-runtime-description\") | .container.image)=\"${UBI_IMAGE}\"" "${TARGETDIR}/editors-definitions/che-code.yaml"
-yq -riY "(.components[] | select(.name==\"idea-rhel8-injector\") | .container.image)=\"${IDEA_IMAGE}\"" "${TARGETDIR}/editors-definitions/che-idea.yaml"
-yq -riY "(.components[] | select(.name==\"idea-rhel8\") | .container.image)=\"${UBI_IMAGE}\"" "${TARGETDIR}/editors-definitions/che-idea.yaml"
+yq -riY "(.components[] | select(.name==\"idea-rhel9-injector\") | .container.image)=\"${IDEA_IMAGE}\"" "${TARGETDIR}/editors-definitions/che-idea.yaml"
+yq -riY "(.components[] | select(.name==\"idea-rhel9\") | .container.image)=\"${UBI_IMAGE}\"" "${TARGETDIR}/editors-definitions/che-idea.yaml"
 
 # if sort the file, we'll lose all the comments
 yq -yY '.spec.template.spec.containers[0].env |= sort_by(.name)' "${TARGETDIR}/${OPERATOR_DEPLOYMENT_YAML}" > "${TARGETDIR}/${OPERATOR_DEPLOYMENT_YAML}2"
