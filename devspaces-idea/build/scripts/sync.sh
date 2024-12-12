@@ -51,7 +51,9 @@ echo ".git/
 README.md
 asset-required-rpms.txt
 build/docker/
+build/dockerfiles/
 build/scripts/sync.sh
+che-plugin/Dockerfile
 compatible-ide.json
 /container.yaml
 /content_sets.*
