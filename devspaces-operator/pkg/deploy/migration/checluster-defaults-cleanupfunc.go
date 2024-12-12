@@ -53,7 +53,7 @@ func cleanUpDevEnvironmentsDefaultComponents(ctx *chetypes.DeployContext) (bool,
 	devEnvironmentsDefaultComponents := []string{
 		"[{\"name\": \"universal-developer-image\", " +
 			"\"container\": {\"image\": \"quay.io/devfile/universal-developer-image:ubi8-38da5c2\"}}]", // previous default
-		defaults.GetDevEnvironmentsDefaultComponents(),"[{\"name\": \"universal-developer-image\", \"container\": {\"image\": \"registry.redhat.io/devspaces/udi-rhel8@sha256:aa39ede33bcbda6aa2723d271c79ab8d8fd388c7dfcbc3d4ece745b7e9c84193\"}}]","[{\"name\": \"universal-developer-image\", \"container\": {\"image\": \"registry.redhat.io/devspaces/udi-rhel8@sha256:8de469cc9131a42092bd66e0f27a52bbc9b9a449235abf5b900d172a1bd3c985\"}}]","[{\"name\": \"universal-developer-image\", \"container\": {\"image\": \"registry.redhat.io/devspaces/udi-rhel8@sha256:99ff1b5c541855e4cf368816c4bcdcdc86d32304023f72c4443213a4032ef05b\"}}]", // current default (can be equal to the previous one)
+		defaults.GetDevEnvironmentsDefaultComponents(),"[{\"name\": \"universal-developer-image\", \"container\": {\"image\": \"registry.redhat.io/devspaces/udi-rhel9@sha256:aa39ede33bcbda6aa2723d271c79ab8d8fd388c7dfcbc3d4ece745b7e9c84193\"}}]","[{\"name\": \"universal-developer-image\", \"container\": {\"image\": \"registry.redhat.io/devspaces/udi-rhel9@sha256:8de469cc9131a42092bd66e0f27a52bbc9b9a449235abf5b900d172a1bd3c985\"}}]","[{\"name\": \"universal-developer-image\", \"container\": {\"image\": \"registry.redhat.io/devspaces/udi-rhel9@sha256:99ff1b5c541855e4cf368816c4bcdcdc86d32304023f72c4443213a4032ef05b\"}}]", // current default (can be equal to the previous one)
 	}
 
 	for _, defaultComponentStr := range devEnvironmentsDefaultComponents {
