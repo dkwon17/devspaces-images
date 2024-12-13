@@ -30,8 +30,8 @@
 #       * asset-ide-packaging.tar.gz - IDE packaging downloaded previously;
 #       * asset-projector-server-assembly.zip - Projector Server assembly;
 #       * asset-static-assembly.tar.gz - archived `static/` directory.
-# https://registry.access.redhat.com/rhel9-2-els/rhel
-FROM registry.redhat.io/rhel9-2-els/rhel:9.2-1362 as ubi-builder
+# https://registry.access.redhat.com/ubi9
+FROM registry.redhat.io/ubi9:9.5-1732804088 as ubi-builder
 COPY --chown=0:0 asset-required-rpms.txt /tmp/asset-required-rpms.txt
 
 RUN mkdir -p /mnt/rootfs
@@ -42,7 +42,7 @@ RUN yum install unzip -y --nodocs && \
         java-11-openjdk-devel \
         libXext libXrender libXtst libXi \
         $(cat /tmp/asset-required-rpms.txt) \
-            --releasever 8 --setopt install_weak_deps=false --nodocs -y && \
+            --releasever 9 --setopt install_weak_deps=false --nodocs -y && \
     yum --installroot /mnt/rootfs clean all
 RUN rm -rf /mnt/rootfs/var/cache/* /mnt/rootfs/var/log/dnf* /mnt/rootfs/var/log/yum.*
 
@@ -82,8 +82,8 @@ RUN for f in "/mnt/rootfs/bin/" "/mnt/rootfs/home/projector" "/mnt/rootfs/etc/pa
 RUN rm /mnt/rootfs/etc/hosts
 
 # Stage 2. Copy from build environment Projector assembly to the runtime. Projector runs in headless mode.
-# https://registry.access.redhat.com/rhel9-2-els/rhel
-FROM registry.redhat.io/rhel9-2-els/rhel:9.2-1362
+# https://registry.access.redhat.com/ubi9-minimal
+FROM registry.redhat.io/ubi9-minimal:9.5-1731593028
 ENV HOME=/home/projector
 ENV PROJECTOR_ASSEMBLY_DIR /projector
 ENV PROJECTOR_CONFIG_DIR $HOME/.jetbrains
@@ -95,7 +95,7 @@ ENTRYPOINT $PROJECTOR_ASSEMBLY_DIR/entrypoint.sh
 ENV SUMMARY="Red Hat OpenShift Dev Spaces - IntelliJ IDEA Community IDE container" \
     DESCRIPTION="Red Hat OpenShift Dev Spaces - IntelliJ IDEA Community IDE container" \
     PRODNAME="devspaces" \
-    COMPNAME="idea-rhel8"
+    COMPNAME="idea-rhel9"
 
 LABEL summary="$SUMMARY" \
       description="$DESCRIPTION" \

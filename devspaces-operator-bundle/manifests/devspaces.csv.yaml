@@ -921,10 +921,10 @@ spec:
                         value: registry-proxy.engineering.redhat.com/rh-osbs/devspaces-code-rhel9:3.19
                       - name: RELATED_IMAGE_editor_definition_che_code_latest_che_code_runtime_description
                         value: registry-proxy.engineering.redhat.com/rh-osbs/devspaces-udi-rhel9:3.19
-                      - name: RELATED_IMAGE_editor_definition_che_idea_latest_idea_rhel8
+                      - name: RELATED_IMAGE_editor_definition_che_idea_latest_idea_rhel9
                         value: registry-proxy.engineering.redhat.com/rh-osbs/devspaces-udi-rhel9:3.19
-                      - name: RELATED_IMAGE_editor_definition_che_idea_latest_idea_rhel8_injector
-                        value: registry-proxy.engineering.redhat.com/rh-osbs/devspaces-idea-rhel8:3.19
+                      - name: RELATED_IMAGE_editor_definition_che_idea_latest_idea_rhel9_injector
+                        value: registry-proxy.engineering.redhat.com/rh-osbs/devspaces-idea-rhel9:3.19
                       - name: RELATED_IMAGE_gateway_authentication_sidecar
                         value: registry.redhat.io/openshift4/ose-oauth-proxy:v4.14
                       - name: RELATED_IMAGE_gateway_authorization_sidecar
