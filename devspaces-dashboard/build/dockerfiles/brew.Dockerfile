@@ -9,7 +9,7 @@
 #   Red Hat, Inc. - initial API and implementation
 
 # https://registry.access.redhat.com/ubi9/nodejs-18
-FROM registry.redhat.io/ubi9/nodejs-18:9.5-1733148761 as builder
+FROM registry.redhat.io/ubi9/nodejs-18:9.5-1734310510 as builder
 # hadolint ignore=DL3002
 USER 0
 RUN dnf -y -q update --exclude=unbound-libs 
@@ -43,7 +43,7 @@ RUN yarn build
 # RUN rm -rf $REMOTE_SOURCES_DIR
 
 # https://registry.access.redhat.com/ubi9/nodejs-18
-FROM registry.redhat.io/ubi9/nodejs-18:9.5-1733148761
+FROM registry.redhat.io/ubi9/nodejs-18:9.5-1734310510
 # hadolint ignore=DL3002
 USER 0
 # hadolint ignore=DL4006
