@@ -201,8 +201,8 @@ addVscodePluginsToYaml () {
   git clone https://github.com/redhat-developer/devspaces-vscode-extensions /tmp/devspaces-vscode-extensions  
   pushd /tmp/devspaces-vscode-extensions >/dev/null
     # configure repository for pushing from Jenkins
-    git config user.email "nickboldt+devstudio-release@gmail.com"
-    git config user.name "devstudio-release"
+    git config user.email "devspacesbuild@redhat.com"
+    git config user.name "devspacesbuild"
     git config --global push.default matching
     git config --global pull.rebase true
     git config --global hub.protocol https
