@@ -8,10 +8,10 @@
 # Contributors:
 #   Red Hat, Inc. - initial API and implementation
 
-# use rhel8/ for Brew, not ubi8/
+# use rhel9/ for Brew, not ubi9/
 # can pin to specific tag filter using rhel8/go-toolset#^1.17
-# https://registry.access.redhat.com/rhel8/go-toolset
-FROM rhel8/go-toolset:1.21.13-1.1727172995 as go-builder
+# https://registry.access.redhat.com/ubi9/go-toolset
+FROM registry.redhat.io/ubi9/go-toolset:1.22.7-1733160835 as go-builder
 
 USER root
 
@@ -65,8 +65,8 @@ RUN \
     ./stow --version
     # END stow
 
-# https://registry.access.redhat.com/ubi8-minimal
-FROM ubi8-minimal:8.10-1086
+# https://registry.access.redhat.com/ubi9-minimal
+FROM registry.redhat.io/ubi9-minimal:9.5-1731593028
 
 USER root
 
@@ -75,7 +75,7 @@ ENV \
     HOME=/home/tooling \
     NODEJS_VERSION="20" \
     PYTHON_VERSION="3.11" \
-    PHP_VERSION="7.4" \
+    PHP_VERSION="8.1" \
     XDEBUG_VERSION="3.1.6" \
     LD_LIBRARY_PATH="/usr/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}" \
     CPATH="/usr/include${CPATH:+:${CPATH}}" \
@@ -104,7 +104,7 @@ ENV \
     SUMMARY="Red Hat OpenShift Dev Spaces - Universal Developer Image container" \
     DESCRIPTION="Red Hat OpenShift Dev Spaces - Universal Developer Image container" \
     PRODNAME="devspaces" \
-    COMPNAME="udi-rhel8"
+    COMPNAME="udi-rhel9"
 
 LABEL summary="$SUMMARY" \
       description="$DESCRIPTION" \
@@ -128,7 +128,7 @@ RUN mkdir -p /home/tooling/
 COPY --chown=0:0 etc/.stow-local-ignore /home/tooling/
 
 # NOTE: uncomment for local build. Must also set full registry path in FROM to registry.redhat.io or registry.access.redhat.com
-# enable rhel 8 content sets (from Brew) to resolve buildah
+# enable rhel 9 content sets (from Brew) to resolve buildah
 # COPY content_set*.repo /etc/yum.repos.d/
 
 ########################################################################
@@ -140,11 +140,14 @@ RUN \
     microdnf install -y dnf && \
     # Disable codeready-builder repos to prevent accidentally installing incorrect packages
     dnf -y -q install 'dnf-command(config-manager)' && \
+    # install libatomic_ops from codeready-builder before disabling it
+    dnf -y -q install libatomic_ops && \
     dnf config-manager --set-disabled codeready-* && \
-    dnf -y -q module reset container-tools maven nodejs php; \
-    dnf -y -q module install container-tools:rhel8 maven:3.8 nodejs:$NODEJS_VERSION php:$PHP_VERSION && \
-    dnf -y -q install --setopt=tsflags=nodocs \
-        golang \
+    dnf -y -q module reset maven nodejs php; \
+    dnf -y -q module install maven:3.8 nodejs:$NODEJS_VERSION php:$PHP_VERSION
+
+RUN dnf -y -q install --setopt=tsflags=nodocs \
+        container-tools golang \
         java-1.8.0-openjdk java-1.8.0-openjdk-devel java-1.8.0-openjdk-headless \
             java-11-openjdk java-11-openjdk-devel java-11-openjdk-src java-11-openjdk-headless \
             java-17-openjdk java-17-openjdk-devel java-17-openjdk-headless \
@@ -156,23 +159,23 @@ RUN \
         python3.11 python3.11-devel python3.11-setuptools python3.11-pip python3.11-wheel \
         libssh-devel libffi-devel redhat-rpm-config cargo openssl-devel pkg-config jq \
         podman buildah skopeo fuse-overlayfs \
-        e2fsprogs libatomic_ops git openssl-devel ca-certificates \
-        bash bash-completion tar gzip unzip bzip2 which shadow-utils findutils wget curl sudo git git-lfs procps-ng tree vim \
+        e2fsprogs git ca-certificates \
+        bash bash-completion tar gzip unzip bzip2 which shadow-utils findutils wget sudo git-lfs procps-ng tree vim \
         # For OpenShift Client 4 (oc): rhocp-4.12-for-rhel-8-x86_64-rpms
         # must hard code a version because otherwise CVP/Brew fails with: Failed component comparison for components: openshift-clients
-        # https://rhsm-pulp.corp.redhat.com/content/dist/layered/rhel8/x86_64/ocp/tools/4.12/os/Packages/o/odo-3.9.0-1.el8.x86_64.rpm
-        # https://rhsm-pulp.corp.redhat.com/content/dist/layered/rhel8/x86_64/ocp/tools/4.12/os/Packages/o/odo-3.9.0-1.el8.s390x.rpm
-        # https://rhsm-pulp.corp.redhat.com/content/dist/layered/rhel8/x86_64/ocp/tools/4.12/os/Packages/o/odo-3.9.0-1.el8.ppc64le.rpm
-        # https://rhsm-pulp.corp.redhat.com/content/dist/layered/rhel8/x86_64/ocp/tools/4.12/os/Packages/h/helm-3.10.1-2.el8.x86_64.rpm
-        # https://rhsm-pulp.corp.redhat.com/content/dist/layered/rhel8/s390x/ocp/tools/4.12/os/Packages/h/helm-3.10.1-2.el8.s390x.rpm
-        # https://rhsm-pulp.corp.redhat.com/content/dist/layered/rhel8/ppc64le/ocp/tools/4.12/os/Packages/h/helm-3.10.1-2.el8.ppc64le.rpm
-        # https://rhsm-pulp.corp.redhat.com/content/dist/layered/rhel8/x86_64/rhocp/4.12/os/Packages/o/openshift-clients-4.12.0-202404161006.p0.gd691257.assembly.stream.el8.x86_64.rpm
-        # https://rhsm-pulp.corp.redhat.com/content/dist/layered/rhel8/s390x/rhocp/4.12/os/Packages/o/openshift-clients-4.12.0-202404161006.p0.gd691257.assembly.stream.el8.s390x.rpm
-        # https://rhsm-pulp.corp.redhat.com/content/dist/layered/rhel8/ppc64le/rhocp/4.12/os/Packages/o/openshift-clients-4.12.0-202404161006.p0.gd691257.assembly.stream.el8.ppc64le.rpm
-        # https://rhsm-pulp.corp.redhat.com/content/dist/layered/rhel8/x86_64/pipelines/1.13/os/Packages/o/openshift-pipelines-client-1.13.0-11230.el8.x86_64.rpm
-        # https://rhsm-pulp.corp.redhat.com/content/dist/layered/rhel8/s390x/pipelines/1.13/os/Packages/o/openshift-pipelines-client-1.13.0-11230.el8.s390x.rpm
-        # https://rhsm-pulp.corp.redhat.com/content/dist/layered/rhel8/ppc64le/pipelines/1.13/os/Packages/o/openshift-pipelines-client-1.13.0-11230.el8.ppc64le.rpm
-        odo-3.9.0-1.el8 helm-3.10.1-2.el8 openshift-clients-4.12.0-202404161006.p0.gd691257.assembly.stream.el8 openshift-pipelines-client-1.13.0-11230.el8 \
+        # https://rhsm-pulp.corp.redhat.com/content/dist/layered/rhel9/x86_64/ocp-tools/4.15/os/Packages/o/odo-3.16.1-1.el9.x86_64.rpm
+        # https://rhsm-pulp.corp.redhat.com/content/dist/layered/rhel9/s390x/ocp-tools/4.15/os/Packages/o/odo-3.16.1-1.el9.s390x.rpm
+        # https://rhsm-pulp.corp.redhat.com/content/dist/layered/rhel9/ppc64le/ocp-tools/4.15/os/Packages/o/odo-3.16.1-1.el9.ppc64le.rpm
+        # https://rhsm-pulp.corp.redhat.com/content/dist/layered/rhel9/x86_64/ocp-tools/4.15/os/Packages/h/helm-3.13.2-35.el9.x86_64.rpm
+        # https://rhsm-pulp.corp.redhat.com/content/dist/layered/rhel9/s390x/ocp-tools/4.15/os/Packages/h/helm-3.13.2-35.el9.s390x.rpm
+        # https://rhsm-pulp.corp.redhat.com/content/dist/layered/rhel9/ppc64le/ocp-tools/4.15/os/Packages/h/helm-3.13.2-35.el9.ppc64le.rpm
+        # https://rhsm-pulp.corp.redhat.com/content/dist/layered/rhel9/x86_64/rhocp/4.17/os/Packages/o/openshift-clients-4.17.0-202412032103.p0.g13001b0.assembly.stream.el9.x86_64.rpm
+        # https://rhsm-pulp.corp.redhat.com/content/dist/layered/rhel9/s390x/rhocp/4.17/os/Packages/o/openshift-clients-4.17.0-202412032103.p0.g13001b0.assembly.stream.el9.s390x.rpm
+        # https://rhsm-pulp.corp.redhat.com/content/dist/layered/rhel9/ppc64le/rhocp/4.17/os/Packages/o/openshift-clients-4.17.0-202412032103.p0.g13001b0.assembly.stream.el9.ppc64le.rpm
+        # https://rhsm-pulp.corp.redhat.com/content/dist/layered/rhel8/x86_64/pipelines/1.16/os/Packages/o/openshift-pipelines-client-1.16.0-11647.el8.x86_64.rpm
+        # https://rhsm-pulp.corp.redhat.com/content/dist/layered/rhel8/s390x/pipelines/1.16/os/Packages/o/openshift-pipelines-client-1.16.0-11647.el8.s390x.rpm
+        # https://rhsm-pulp.corp.redhat.com/content/dist/layered/rhel8/ppc64le/pipelines/1.16/os/Packages/o/openshift-pipelines-client-1.16.0-11647.el8.ppc64le.rpm
+        odo helm openshift-clients-4.17.0-202412032103.p0.g13001b0.assembly.stream.el9 openshift-pipelines-client-1.16.0-11647.el8
     && \
     dnf -y -q reinstall shadow-utils && \
     # fetch CVE updates (can exclude rpms to prevent update, eg., --exclude=odo)
@@ -320,7 +323,8 @@ RUN \
     ########################################################################
     # .NET (dotnet) 8.0 (Tech Preview)
     ########################################################################
-    dnf -y -q --setopt=tsflags=nodocs install dotnet dotnet-sdk-8.0 && \
+    # dotnet rpm was removed in RHEL 9
+    dnf -y -q --setopt=tsflags=nodocs install dotnet-sdk-8.0 && \
     ########################################################################
     # PHP (Tech Preview) - see https://catalog.redhat.com/software/containers/ubi8/php-73/5d400891bed8bd38099104e0
     ########################################################################
@@ -365,6 +369,8 @@ COPY --from=go-builder $REMOTE_SOURCES_DIR/gopls/app/gopls/gopls $HOME/go/bin/go
 COPY --from=go-builder $REMOTE_SOURCES_DIR/kubedock/app/kubedock $HOME/go/bin/kubedock
 COPY --from=go-builder $REMOTE_SOURCES_DIR/stow/app/build/bin/ /usr/bin/
 COPY --from=go-builder $REMOTE_SOURCES_DIR/stow/app/build/share/ /usr/share/
+# Specifically copy the perl files since the directories don't match the builder
+COPY --from=go-builder $REMOTE_SOURCES_DIR/stow/app/build/share/perl5/5.32/ /usr/share/perl5/vendor_perl/
 
 # Create symbolic links from /home/tooling/ -> /home/user/
 RUN stow . -t /home/user/ -d /home/tooling/ --no-folding && \
