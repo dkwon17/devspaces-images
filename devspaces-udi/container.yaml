@@ -14,6 +14,7 @@ compose:
   inherit: false
   pulp_repos: true
   signing_intent: release
+  include_unpublished_pulp_repos: true
 
 # instead of docker_api, use imagebuilder for multistage builds
 image_build_method: imagebuilder
