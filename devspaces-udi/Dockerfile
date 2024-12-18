@@ -11,7 +11,7 @@
 # use rhel9/ for Brew, not ubi9/
 # can pin to specific tag filter using rhel8/go-toolset#^1.17
 # https://registry.access.redhat.com/ubi9/go-toolset
-FROM registry.redhat.io/ubi9/go-toolset:1.22.7-1733160835 as go-builder
+FROM registry.redhat.io/ubi9/go-toolset:9.5-1733160835 as go-builder
 
 USER root
 
