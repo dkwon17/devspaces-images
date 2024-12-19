@@ -161,7 +161,7 @@ RUN dnf -y -q install --setopt=tsflags=nodocs \
         podman buildah skopeo fuse-overlayfs \
         e2fsprogs git ca-certificates \
         bash bash-completion tar gzip unzip bzip2 which shadow-utils findutils wget sudo git-lfs procps-ng tree vim \
-        # For OpenShift Client 4 (oc): rhocp-4.12-for-rhel-8-x86_64-rpms
+        # For OpenShift Client 4 (oc): rhocp-4.17-for-rhel-8-x86_64-rpms
         # must hard code a version because otherwise CVP/Brew fails with: Failed component comparison for components: openshift-clients
         # https://rhsm-pulp.corp.redhat.com/content/dist/layered/rhel9/x86_64/ocp-tools/4.15/os/Packages/o/odo-3.16.1-1.el9.x86_64.rpm
         # https://rhsm-pulp.corp.redhat.com/content/dist/layered/rhel9/s390x/ocp-tools/4.15/os/Packages/o/odo-3.16.1-1.el9.s390x.rpm
