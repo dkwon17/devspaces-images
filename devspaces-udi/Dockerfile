@@ -218,11 +218,7 @@ RUN \
     mkdir -p /var/lib/shared/overlay-images /var/lib/shared/overlay-layers; \
     touch /var/lib/shared/overlay-images/images.lock; \
     touch /var/lib/shared/overlay-layers/layers.lock && \
-    ## Rootless podman install #5: but use VFS since we were not able to make Fuse work yet...
-    # TODO switch this to fuse in OCP 4.12?
-    mkdir -p "${HOME}"/.config/containers && \
-    (echo '[storage]';echo 'driver = "vfs"') > "${HOME}"/.config/containers/storage.conf && \
-    ## Rootless podman install #6: rename podman to allow the execution of 'podman run' using
+    ## Rootless podman install #5: rename podman to allow the execution of 'podman run' using
     ##                             kubedock but 'podman build' using podman.orig
     mv /usr/bin/podman /usr/bin/podman.orig && \
     # Docker alias

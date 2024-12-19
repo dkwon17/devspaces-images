@@ -118,6 +118,16 @@ else
     ln -f -s /usr/bin/podman.orig /home/tooling/.local/bin/podman
 fi
 
+# Configure container builds to use vfs or fuse-overlayfs
+if [ ! -d "${HOME}/.config/containers" ]; then
+  mkdir -p ${HOME}/.config/containers
+  if [ -c "/dev/fuse" ] && [ -f "/usr/bin/fuse-overlayfs" ]; then
+    (echo '[storage]';echo 'driver = "overlay"';echo '[storage.options.overlay]';echo 'mount_program = "/usr/bin/fuse-overlayfs"') > ${HOME}/.config/containers/storage.conf
+  else
+    (echo '[storage]';echo 'driver = "vfs"') > "${HOME}"/.config/containers/storage.conf
+  fi
+fi
+
 #############################################################################
 # Stow: If persistUserHome is enabled, then the contents of /home/user/
 # will be mounted by a PVC and overwritten. In this case, we use stow to
